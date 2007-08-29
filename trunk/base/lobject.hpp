@@ -9,6 +9,8 @@ public:
     LObject();
     ~LObject();
 
+    void Construct();
+
     LType * GetType();    
     LObject * GetParent();    
     LArray<LObject *> * GetChildren();

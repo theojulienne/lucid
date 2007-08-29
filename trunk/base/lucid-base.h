@@ -15,6 +15,22 @@ typedef int bool_t;
 
 #ifdef __cplusplus
 
+#define LT_CALL_SELF_CPP( cpp_func, params... ) \
+     G_STMT_START \
+     { \
+         g_return_if_fail( self != NULL ); \
+         self->cpp_func( params ); \
+     } \
+     G_STMT_END
+ 
+#define LT_RETURN_CALL_SELF_CPP( cpp_func, fail_value, params... ) \
+     G_STMT_START \
+     { \
+         g_return_val_if_fail( self != NULL, fail_value ); \
+         return self->cpp_func( params ); \
+     } \
+     G_STMT_END
+
 #include <ltype.hpp>
 #include <larray.hpp>
 #include <lbase.hpp>

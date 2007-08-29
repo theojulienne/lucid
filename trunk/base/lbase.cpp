@@ -33,6 +33,7 @@ LBase * lt_base_ref(LBase * self)
     g_return_val_if_fail(self != NULL, NULL);
 
     self->Ref();
+
     return self;
 }
 
@@ -42,3 +43,4 @@ void lt_base_unref(LBase * self)
     
     self->Unref();
 }
+

@@ -29,6 +29,7 @@ extern "C" LType * c_name##_register_type(); \
 cpp_klass::cpp_klass () \
 { \
     m_type = c_name##_register_type(); \
+    this->Construct(); \
 } \
 static void * c_name##_ctor() \
 { \
