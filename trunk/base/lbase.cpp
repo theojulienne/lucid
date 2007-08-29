@@ -9,7 +9,8 @@ void lt_base_unref(LBase * self);
 }
 
 LBase::LBase(): ref_count(LBASE_FLOAT_BIT)
-{   
+{
+    g_print("%s(%p)\n", __FUNCTION__, this);
 }
 
 void LBase::Ref ()

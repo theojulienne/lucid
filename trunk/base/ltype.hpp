@@ -25,11 +25,15 @@ inline LType::LType()
 #define LT_TYPE_INIT(c_name) m_type(c_name##_register_type())
 
 #define LT_DEFINE_TYPE(cpp_klass, c_name, super_klass) \
+extern "C" LType * c_name##_register_type(); \
+cpp_klass::cpp_klass () \
+{ \
+    m_type = c_name##_register_type(); \
+} \
 static void * c_name##_ctor() \
 { \
     return new cpp_klass(); \
 } \
-extern "C" LType * c_name##_register_type(); \
 extern "C" cpp_klass * c_name##_create() \
 { \
     return (cpp_klass *)LType::CreateInstance(c_name##_register_type()); \
