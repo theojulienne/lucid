@@ -18,11 +18,9 @@ private:
     lt_type_create_func * m_create_func;    
 };
 
-inline LType::LType()
+inline LType::LType(): m_klass_name(NULL),  m_super_klass(NULL), m_create_func(NULL)
 {
 }
-
-#define LT_TYPE_INIT(c_name) m_type(c_name##_register_type())
 
 #define LT_DEFINE_TYPE(cpp_klass, c_name, super_klass) \
 extern "C" LType * c_name##_register_type(); \
