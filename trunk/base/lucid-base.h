@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include <glib.h>
 
@@ -104,8 +105,8 @@ typedef void LObject;
 typedef void lt_object_event_func(LObject * sender, LHashtable * args, void * user_data);
 
 LObject * lt_object_create();
-void lt_object_add_handler(LObject * self, char * event_name, lt_object_event_func * event_func, void * user_data);
-void lt_object_remove_handler(LObject * self, char *event_name, lt_object_event_func * event_func, void * user_data);
+uint64_t lt_object_add_handler(LObject * self, char * event_name, lt_object_event_func * event_func, void * user_data);
+void lt_object_remove_handler(LObject * self, char * event_name, uint64_t event_id);
 
 #endif
 

@@ -42,7 +42,15 @@ int main(int argc, char ** argv)
 
     obj = lt_object_create();
     
-    lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee);
+    uint64_t id = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee);
+    printf("%d\n", id);    
+    lt_object_remove_handler(obj, "foo", id);
+
+    id = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee);
+    printf("%d\n", id);    
+    lt_object_remove_handler(obj, "foo", id);   
+    //silent failure    
+    lt_object_remove_handler(obj, "foo", id);
 
     lt_base_unref(LT_BASE(obj));
 

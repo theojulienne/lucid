@@ -32,8 +32,8 @@ public:
     LObject * GetParent();    
     LArray<LObject *> * GetChildren();
 
-    void AddHandler(char * event_name, lt_object_event_func * event_func, void * user_data);
-    void RemoveHandler (char *event_name, lt_object_event_func * event_func, void * user_data);
+    uint64_t AddHandler(char * event_name, lt_object_event_func * event_func, void * user_data);
+    void RemoveHandler (char * event_name, uint64_t event_id);
     
 protected:
     void Construct();
