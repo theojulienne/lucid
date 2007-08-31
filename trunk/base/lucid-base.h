@@ -15,6 +15,12 @@ typedef int bool_t;
 
 #ifdef __cplusplus
 
+static inline char * sstrdup(char * s)
+{
+    g_assert(s != NULL);
+    return g_strdup(s);
+}
+
 #define LT_CALL_SELF_CPP( cpp_func, params... ) \
      G_STMT_START \
      { \
@@ -30,6 +36,12 @@ typedef int bool_t;
          return self->cpp_func( params ); \
      } \
      G_STMT_END
+
+#ifndef LT_NO_DEBUG
+#define LT_DEBUG(fmt, ...)  g_print(fmt, __VA_ARGS__)
+#else
+#define LT_DEBUG(fmt, ...)
+#endif
 
 #include <ltype.hpp>
 #include <larray.hpp>
@@ -89,7 +101,11 @@ LArray * lt_hashtable_get_values(LHashtable * self);
 
 typedef void LObject;
 
+typedef void lt_object_event_func(LObject * sender, LHashtable * args, void * user_data);
+
 LObject * lt_object_create();
+void lt_object_add_handler(LObject * self, char * event_name, lt_object_event_func * event_func, void * user_data);
+void lt_object_remove_handler(LObject * self, char *event_name, lt_object_event_func * event_func, void * user_data);
 
 #endif
 

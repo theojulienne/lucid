@@ -1,5 +1,10 @@
 #include <lucid-base.h>
 
+static void _test_foo(LObject * obj, LHashtable * args, void * user_data)
+{
+    printf("%s(%p, %p, %p)\n", __FUNCTION__, obj, args, user_data);
+}
+
 int main(int argc, char ** argv)
 {
     LObject * obj;
@@ -36,6 +41,8 @@ int main(int argc, char ** argv)
     lt_base_unref(LT_BASE(hash));
 
     obj = lt_object_create();
+    
+    lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee);
 
     lt_base_unref(LT_BASE(obj));
 
@@ -45,3 +52,4 @@ int main(int argc, char ** argv)
 
     return 0;
 }
+

@@ -17,6 +17,7 @@ public:
                     void * user_arg);
     void Insert(void * key, void * value);
     void * Lookup(const void * key);
+    bool_t LookupExtended(const void * key, void ** orig_key, void ** value);
     bool_t Remove(const void * key);    
     void Clear();
     int Count();
@@ -70,6 +71,11 @@ inline void * LHashtableImpl::Lookup(const void * key)
     return g_hash_table_lookup((GHashTable *)this->impl, key);
 }
 
+inline bool_t LHashtableImpl::LookupExtended(const void * key, void ** orig_key, void ** value)
+{
+    return (bool_t)g_hash_table_lookup_extended((GHashTable *)this->impl, key, orig_key, value);
+}
+
 inline bool_t LHashtableImpl::Remove(const void * key)
 {
     return (bool_t)g_hash_table_remove((GHashTable *)this->impl, key);
@@ -97,6 +103,7 @@ public:
     LHashtable(bool_t owns_strings, void (* val_free_fn) (void *)); 
     void Insert(K key, V value);
     V Lookup(const K key);
+    bool_t LookupExtended(const K key, K * orig_key, V * value);
     bool_t Remove(const K key);
     LArray<K> * GetKeys();
     LArray<V> * GetValues();
@@ -128,6 +135,12 @@ template <class K, class V>
 inline V LHashtable<K, V>::Lookup(const K key)
 {
     return (V)LHashtableImpl::Lookup(key);
+}
+
+template <class K, class V> 
+inline bool_t LHashtable<K, V>::LookupExtended(const K key, K * orig_key, V * value)
+{
+    return LHashtableImpl::LookupExtended(key, (void **)orig_key, (void **)value);
 }
 
 template <class K, class V> 

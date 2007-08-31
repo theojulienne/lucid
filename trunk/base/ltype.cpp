@@ -35,10 +35,17 @@ LType * LType::Register(const char * klass_name,
     type->m_klass_name = klass_name;
     type->m_super_klass = super_klass;
     type->m_create_func = create_func;
+    type->m_events = new LArray<char *>(g_free);
 
     _lt_type_table->Insert(klass_name, type);
 
     return type;       
+}
+
+// ADD A CHECK FOR A NAME BEING ADDED TWICE
+bool_t LType::AddEvent(char * name)
+{
+    this->m_events->Append(sstrdup(name));
 }
 
 void * LType::CreateInstance(LType * type)
