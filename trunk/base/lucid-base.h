@@ -100,13 +100,15 @@ int lt_hashtable_count(LHashtable * self);
 LArray * lt_hashtable_get_keys(LHashtable * self);
 LArray * lt_hashtable_get_values(LHashtable * self);
 
+typedef void LEvent;
+
 typedef void LObject;
 
 typedef void lt_object_event_func(LObject * sender, LHashtable * args, void * user_data);
 
 LObject * lt_object_create();
-uint64_t lt_object_add_handler(LObject * self, char * event_name, lt_object_event_func * event_func, void * user_data);
-void lt_object_remove_handler(LObject * self, char * event_name, uint64_t event_id);
+void lt_object_add_handler(LObject * self, char * event_name, lt_object_event_func * event_func, void * user_data);
+void lt_object_remove_handler(LObject * self, char * event_name, lt_object_event_func * event_func, void * user_data);
 
 #endif
 

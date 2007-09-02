@@ -1,3 +1,5 @@
+#include <stdarg.h>
+
 #include <lucid-base.h>
 
 #define LT_CHECK_TYPE(type) G_STMT_START { \
@@ -43,9 +45,24 @@ LType * LType::Register(const char * klass_name,
 }
 
 // ADD A CHECK FOR A NAME BEING ADDED TWICE
-bool_t LType::AddEvent(char * name)
+bool_t LType::AddEvents(char * first_event, ...)
 {
-    this->m_events->Append(sstrdup(name));
+    va_list argp;
+    char * event;
+
+    va_start(argp, first_event);
+
+    event = first_event;
+
+    while(event != NULL)
+    {
+        this->m_events->Append(sstrdup(event));   
+        event = va_arg(argp, char *);
+    }
+       
+    va_end(argp);
+    
+    return TRUE;
 }
 
 void * LType::CreateInstance(LType * type)

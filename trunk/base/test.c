@@ -1,6 +1,6 @@
 #include <lucid-base.h>
 
-static void _test_foo(LObject * obj, LHashtable * args, void * user_data)
+static void _test_foo(LObject * obj, LEvent * args, void * user_data)
 {
     printf("%s(%p, %p, %p)\n", __FUNCTION__, obj, args, user_data);
 }
@@ -11,6 +11,8 @@ int main(int argc, char ** argv)
     LHashtable * hash;
     LArray * keys; 
     int i, len;    
+    
+    //g_mem_set_vtable(glib_mem_profiler_table);
     
     lt_type_init();
 
@@ -42,21 +44,21 @@ int main(int argc, char ** argv)
 
     obj = lt_object_create();
     
-    uint64_t id = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee);
-    printf("%d\n", id);    
-    lt_object_remove_handler(obj, "foo", id);
+    lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee);
 
-    id = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee);
-    printf("%d\n", id);    
-    lt_object_remove_handler(obj, "foo", id);   
+    lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee);
+   
+    lt_object_remove_handler(obj, "foo", _test_foo, (void *)0xc0ffee);   
     //silent failure    
-    lt_object_remove_handler(obj, "foo", id);
+    lt_object_remove_handler(obj, "foo", _test_foo, (void *)0xc0ffee);
 
     lt_base_unref(LT_BASE(obj));
 
     obj = (LObject *)lt_type_create_instance(lt_type_from_name("LObject"));
 
     lt_base_unref(LT_BASE(obj));
+
+    //g_mem_profile ();
 
     return 0;
 }

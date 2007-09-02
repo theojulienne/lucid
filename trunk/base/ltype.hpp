@@ -14,7 +14,7 @@ public:
     const char * GetName();
     LType * GetParent();
     
-    bool_t AddEvent(char * name);
+    bool_t AddEvents(char * first_event, ...);
     LArray<char *> * GetEvents();
 
     static LType * Register(const char * klass_name, 

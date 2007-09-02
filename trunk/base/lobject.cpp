@@ -2,9 +2,16 @@
 
 extern "C"
 {
-uint64_t lt_object_add_handler(LObject * self, char * event_name, lt_object_event_func * event_func, void * user_data);
-void lt_object_remove_handler(LObject * self, char * event_name, uint64_t event_id);
+void lt_object_add_handler(LObject * self, char * event_name, lt_object_event_func * event_func, void * user_data);
+void lt_object_remove_handler(LObject * self, char * event_name, lt_object_event_func * event_func, void * user_data);
 }
+
+class LEventHandler
+{
+public:
+    lt_object_event_func * event_func;
+    void * user_data;
+};
 
 static void _lt_object_events_free(void * value)
 {
@@ -20,7 +27,7 @@ LT_DEFINE_TYPE(LObject, lt_object, NULL);
 
 bool_t LObject::RegisterEvents(LType * type)
 {
-    return type->AddEvent("foo");
+    return type->AddEvents("foo", "bar", NULL);
 }
 
 void LObject::Construct()
@@ -61,19 +68,19 @@ void LObject::SetupEvents()
 // FIXME - malloc() can re-use pointer pretty quickly..so I'm not sure if this function is safe or not. 
 //  But having to use yet another hashtable to maintain "unique IDs" would be gross..
 
-uint64_t LObject::AddHandler(char * event_name, lt_object_event_func * event_func, void * user_data)
+void LObject::AddHandler(char * event_name, lt_object_event_func * event_func, void * user_data)
 {
     char * orig_key;
     void * value;
     GList * event_handlers;
     LEventHandler * handler;
 
-    g_return_val_if_fail(event_name != NULL, -1);
-    g_return_val_if_fail(event_func != NULL, -1);
+    g_return_if_fail(event_name != NULL);
+    g_return_if_fail(event_func != NULL);
 
     // FIXME - SILENTLY FAIL ?
     if(! this->m_events_map->LookupExtended(event_name, &orig_key, &value))
-        return -1;
+        return;
 
     handler = g_new(LEventHandler, 1);
     g_assert(handler);    
@@ -84,20 +91,18 @@ uint64_t LObject::AddHandler(char * event_name, lt_object_event_func * event_fun
     event_handlers = this->m_events->GetItem(GPOINTER_TO_INT(value));
     event_handlers = g_list_append(event_handlers, handler);
     this->m_events->SetItem(GPOINTER_TO_INT(value), event_handlers);
-
-    return (uint64_t)handler;
 }
 
 // FIXME- Its really stupid that you need the event name to remove a handler- but its a HUGE performance gain.
-void LObject::RemoveHandler (char * event_name, uint64_t event_id)
+void LObject::RemoveHandler (char * event_name, lt_object_event_func * event_func, void * user_data)
 {
     char * orig_key;
     void * value;
     GList * event_handlers, *l;
-    void * handler = NULL;
+    LEventHandler * handler = NULL;
 
-    g_return_if_fail(event_id > 0);       
     g_return_if_fail(event_name != NULL);
+    g_return_if_fail(event_func != NULL);       
     
     // FIXME - SILENTLY FAIL ?
     if(! this->m_events_map->LookupExtended(event_name, &orig_key, &value))
@@ -105,8 +110,8 @@ void LObject::RemoveHandler (char * event_name, uint64_t event_id)
 
     event_handlers = this->m_events->GetItem(GPOINTER_TO_INT(value));
 	for (l = event_handlers; l; l = l->next) {
-        handler = l->data;		
-        if(event_id == (uint64_t)handler)
+        handler = (LEventHandler *)l->data;		
+        if(handler->event_func == event_func && handler->user_data == user_data)
             break;
 	}
 
@@ -118,7 +123,7 @@ void LObject::RemoveHandler (char * event_name, uint64_t event_id)
     this->m_events->SetItem(GPOINTER_TO_INT(value), event_handlers);
 }
 
-void LObject::SendRaw(char * event_name, LHashtable<char *, LTypebox *> * args)
+void LObject::SendRaw(char * event_name, LEvent * args)
 {
     char * orig_key;
     void * value;
@@ -141,13 +146,13 @@ void LObject::SendRaw(char * event_name, LHashtable<char *, LTypebox *> * args)
     }    
 }
 
-uint64_t lt_object_add_handler(LObject * self, char * event_name, lt_object_event_func * event_func, void * user_data)
+void lt_object_add_handler(LObject * self, char * event_name, lt_object_event_func * event_func, void * user_data)
 {
-    LT_RETURN_CALL_SELF_CPP(AddHandler, -1, event_name, event_func, user_data);
+    LT_CALL_SELF_CPP(AddHandler, event_name, event_func, user_data);
 }
 
-void lt_object_remove_handler(LObject * self, char * event_name, uint64_t event_id)
+void lt_object_remove_handler(LObject * self, char * event_name, lt_object_event_func * event_func, void * user_data)
 {
-    LT_CALL_SELF_CPP(RemoveHandler, event_name, event_id);
+    LT_CALL_SELF_CPP(RemoveHandler, event_name, event_func, user_data);
 }
 

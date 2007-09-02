@@ -3,20 +3,12 @@
 
 #include <lbase.hpp>
 
-class LTypebox;
 class LObject;
+class LEvent;
 
 #ifndef lt_object_event_func
-typedef void lt_object_event_func(LObject * sender, LHashtable<char *, LTypebox *> * args, void * user_data);
+typedef void lt_object_event_func(LObject * sender, LEvent * args, void * user_data);
 #endif
-
-
-class LEventHandler
-{
-public:
-    lt_object_event_func * event_func;
-    void * user_data;
-};
 
 
 class LObject: public LBase
@@ -32,12 +24,12 @@ public:
     LObject * GetParent();    
     LArray<LObject *> * GetChildren();
 
-    uint64_t AddHandler(char * event_name, lt_object_event_func * event_func, void * user_data);
-    void RemoveHandler (char * event_name, uint64_t event_id);
+    void AddHandler(char * event_name, lt_object_event_func * event_func, void * user_data);
+    void RemoveHandler (char * event_name, lt_object_event_func * event_func, void * user_data);
     
 protected:
     void Construct();
-    void SendRaw(char * event_name, LHashtable<char *, LTypebox *> * args);
+    void SendRaw(char * event_name, LEvent * args);
 
 private:
     void SetupEvents();
