@@ -3,6 +3,7 @@
 
 #include <lbase.hpp>
 
+//THIS IS ALL POINTER-BASED..BUT YOU CAN'T RESTRICT A C++ TEMPLTE TO A REFERENCE TYPE
 
 class LHashtableImpl: public LBase
 {
@@ -23,6 +24,7 @@ public:
     int Count();
     LArray<> * GetKeys();
     LArray<> * GetValues();
+    LArray<> * GetPairs();
 private:
     void * impl;    
 };
@@ -92,6 +94,12 @@ inline int LHashtableImpl::Count()
 }
 
 
+template <class K = void *, class V = void *> class LHashtableEntry
+{
+public:
+    K Key;
+    V Value;    
+};
 
 template <class K = void *, class V = void *> class LHashtable: public LHashtableImpl
 {
@@ -106,7 +114,8 @@ public:
     bool_t LookupExtended(const K key, K * orig_key, V * value);
     bool_t Remove(const K key);
     LArray<K> * GetKeys();
-    LArray<V> * GetValues();
+    LArray<V> * GetValues();    
+    LArray<LHashtableEntry<K, V> *> * GetPairs();
 };
 
 template <class K, class V>
@@ -159,6 +168,12 @@ template <class K, class V>
 inline LArray<V> * LHashtable<K, V>::GetValues()
 {   
     return reinterpret_cast<LArray<V> *>(LHashtableImpl::GetValues());    
+}
+
+template <class K, class V>
+inline LArray<LHashtableEntry<K, V> *> * LHashtable<K, V>::GetPairs()
+{
+    return reinterpret_cast<LArray<LHashtableEntry<K, V> *> *>(LHashtableImpl::GetPairs());    
 }
 
 #endif

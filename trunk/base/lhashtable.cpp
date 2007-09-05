@@ -2,6 +2,7 @@
 
 static void _lt_hashtable_append_key_cb(const void * key, const void * value, void * user_arg);
 static void _lt_hashtable_append_value_cb(const void * key, const void * value, void * user_arg);
+static void _lt_hashtable_append_pair_cb(const void * key, const void * value, void * user_arg);
 
 typedef void hashtable_foreach_func(const void * key, const void * value, void * user_arg);
 
@@ -48,9 +49,16 @@ LArray<> * LHashtableImpl::GetKeys()
  
 LArray<> * LHashtableImpl::GetValues()
 {
-    LArray<> * keys = new LArray<>(NULL);
-    this->Foreach(_lt_hashtable_append_value_cb, (void *)keys);
-    return keys;  
+    LArray<> * values = new LArray<>(NULL);
+    this->Foreach(_lt_hashtable_append_value_cb, (void *)values);
+    return values;  
+}
+
+LArray<> * LHashtableImpl::GetPairs()
+{
+    LArray<> * pairs = new LArray<>(g_free);
+    this->Foreach(_lt_hashtable_append_pair_cb, (void *)pairs);
+    return pairs;
 }
 
 LHashtable<> * lt_hashtable_create(unsigned int (* hash_fn) (const void *),
@@ -118,5 +126,17 @@ static void _lt_hashtable_append_value_cb(const void * key, const void * value, 
 {
     LArray<> * array = static_cast<LArray<> *>(user_arg);
     array->Append((void *)value);
+}
+
+static void _lt_hashtable_append_pair_cb(const void * key, const void * value, void * user_arg)
+{
+    void ** args;
+    LArray<> * array;
+    args = (void **)g_malloc(sizeof(void *) * 2);
+    array = static_cast<LArray<> *>(user_arg);
+    g_assert(args);
+    args[0] = (void *)key;
+    args[1] = (void *)value;
+    array->Append((void *)args);
 }
 

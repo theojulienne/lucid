@@ -24,8 +24,10 @@ public:
     LObject * GetParent();    
     LArray<LObject *> * GetChildren();
 
-    void AddHandler(char * event_name, lt_object_event_func * event_func, void * user_data);
-    void RemoveHandler (char * event_name, lt_object_event_func * event_func, void * user_data);
+    LEventID AddHandler(char * event_name, lt_object_event_func * event_func, 
+        void * user_data, void (* val_free_fn) (void *));
+    bool_t RemoveHandler (LEventID event_id);
+    LEventID FindHandler(lt_object_event_func * event_func, void * user_data);
     
 protected:
     void Construct();
@@ -38,8 +40,7 @@ private:
     LObject * m_parent;
     LArray<LObject *> * m_children;    
 
-    LHashtable<char *, void *> * m_events_map;
-    LArray<GList *> * m_events;
+    LHashtable<char *, GSList *> * m_events;
 };
 
 inline LType * LObject::GetType()

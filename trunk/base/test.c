@@ -11,7 +11,8 @@ int main(int argc, char ** argv)
     LHashtable * hash;
     LArray * keys; 
     int i, len;    
-    
+    LEventID id1, id2;
+
     //g_mem_set_vtable(glib_mem_profiler_table);
     
     lt_type_init();
@@ -44,20 +45,26 @@ int main(int argc, char ** argv)
 
     obj = lt_object_create();
     
-    lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee);
+    id1 = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee, NULL);
 
-    lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee);
+    g_assert(id1);
+
+    id2 = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee, NULL);
    
-    lt_object_remove_handler(obj, "foo", _test_foo, (void *)0xc0ffee);   
-    //silent failure    
-    lt_object_remove_handler(obj, "foo", _test_foo, (void *)0xc0ffee);
+    g_assert(id2);
+
+    g_assert(lt_object_remove_handler(obj, id1));   
+  
+    g_assert(lt_object_remove_handler(obj, id2));
+
+    lt_object_find_handler(obj, _test_foo, (void *)0xc0ffee);
 
     lt_base_unref(LT_BASE(obj));
 
-    obj = (LObject *)lt_type_create_instance(lt_type_from_name("LObject"));
+/*    obj = (LObject *)lt_type_create_instance(lt_type_from_name("LObject"));
 
     lt_base_unref(LT_BASE(obj));
-
+*/
     //g_mem_profile ();
 
     return 0;
