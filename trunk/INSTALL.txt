@@ -1,0 +1,4 @@
+For the moment..type "make" and hope for the best! :-P
+(Or modify it for your platform)
+
+A real build system will be added shortly..
