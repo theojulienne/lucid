@@ -51,6 +51,7 @@ static inline char * sstrdup(char * s)
 #include <ltype.hpp>
 #include <larray.hpp>
 #include <lbase.hpp>
+#include <lmodule.hpp>
 #include <lhashtable.hpp>
 #include <lobject.hpp>
 
@@ -99,10 +100,16 @@ LHashtable * lt_hashtable_str_create(bool_t owns_strings, void (* val_free_fn) (
 void lt_hashtable_insert(LHashtable * self, void * key, void * value);
 void * lt_hashtable_lookup(LHashtable * self, void * key);
 bool_t lt_hashtable_remove(LHashtable * self, void * key);
-void lt_hashtable_clear(LHashtable * self, void * key);
+void lt_hashtable_clear(LHashtable * self);
 int lt_hashtable_count(LHashtable * self);
 LArray * lt_hashtable_get_keys(LHashtable * self);
 LArray * lt_hashtable_get_values(LHashtable * self);
+
+typedef void LModule;
+
+LModule * lt_module_load(const char * file_name);
+const char * lt_module_get_name(LModule * self);
+void * lt_module_get_symbol(LModule * self, const char * symbol_name);
 
 typedef void LEvent;
 

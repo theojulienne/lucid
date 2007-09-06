@@ -5,17 +5,11 @@ static void _test_foo(LObject * obj, LEvent * args, void * user_data)
     printf("%s(%p, %p, %p)\n", __FUNCTION__, obj, args, user_data);
 }
 
-int main(int argc, char ** argv)
+static void hash_test()
 {
-    LObject * obj;
     LHashtable * hash;
     LArray * keys; 
     int i, len;    
-    LEventID id1, id2;
-
-    //g_mem_set_vtable(glib_mem_profiler_table);
-    
-    lt_type_init();
 
     hash = lt_hashtable_str_create(FALSE, NULL);
 
@@ -42,6 +36,45 @@ int main(int argc, char ** argv)
     
     lt_array_destroy(keys);
     lt_base_unref(LT_BASE(hash));
+}
+
+bool_t call_me_in_module_test()
+{
+    return TRUE;
+}
+
+static void module_test()
+{
+    LModule * module = lt_module_load(NULL);
+    bool_t (* func) ();
+
+    g_assert(module);
+
+    g_assert(lt_module_get_name(module));
+
+    g_assert(!strcmp("main", lt_module_get_name(module)));
+
+    func = lt_module_get_symbol(module, "call_me_in_module_test");
+
+    g_assert(func != NULL);
+
+    g_assert(func());
+
+    lt_base_unref(LT_BASE(module));
+}
+
+int main(int argc, char ** argv)
+{
+    LObject * obj;
+    LEventID id1, id2;
+
+    //g_mem_set_vtable(glib_mem_profiler_table);
+    
+    lt_type_init();
+
+    hash_test();
+
+    module_test();
 
     obj = lt_object_create();
     

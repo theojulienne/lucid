@@ -16,7 +16,7 @@ LHashtable<> * lt_hashtable_str_create(bool_t owns_strings, void (* val_free_fn)
 void lt_hashtable_insert(LHashtable<> * self, void * key, void * value);
 void * lt_hashtable_lookup(LHashtable<> * self, void * key);
 bool_t lt_hashtable_remove(LHashtable<> * self, void * key);
-void lt_hashtable_clear(LHashtable<> * self, void * key);
+void lt_hashtable_clear(LHashtable<> * self);
 int lt_hashtable_count(LHashtable<> * self);
 LArray<> * lt_hashtable_get_keys(LHashtable<> * self);
 LArray<> * lt_hashtable_get_values(LHashtable<> * self);
@@ -76,44 +76,37 @@ LHashtable<> * lt_hashtable_str_create(bool_t owns_strings, void (* val_free_fn)
 
 void lt_hashtable_insert(LHashtable<> * self, void * key, void * value)
 {
-    g_return_if_fail(self != NULL);
-    self->Insert(key, value);
+    LT_CALL_SELF_CPP(Insert, key, value);
 }
 
 void * lt_hashtable_lookup(LHashtable<> * self, void * key)
 {
-    g_return_val_if_fail(self != NULL, NULL);
-    return self->Lookup(key);
+    LT_RETURN_CALL_SELF_CPP(Lookup, NULL, key);
 }
 
 bool_t lt_hashtable_remove(LHashtable<> * self, void * key)
 {
-    g_return_val_if_fail(self != NULL, FALSE);
-    return self->Remove(key);
+    LT_RETURN_CALL_SELF_CPP(Remove, FALSE, key);
 }
 
-void lt_hashtable_clear(LHashtable<> * self, void * key)
+void lt_hashtable_clear(LHashtable<> * self)
 {
-    g_return_if_fail(self != NULL);
-    self->Clear();
+    LT_CALL_SELF_CPP(Clear);
 }
 
 int lt_hashtable_count(LHashtable<> * self)
 {
-    g_return_val_if_fail(self != NULL, -1);
-    return self->Count();
+    LT_RETURN_CALL_SELF_CPP(Count, -1);
 }
 
 LArray<> * lt_hashtable_get_keys(LHashtable<> * self)
 {
-    g_return_val_if_fail(self != NULL, NULL); 
-    return self->GetKeys();
+    LT_RETURN_CALL_SELF_CPP(GetKeys, NULL);
 }
 
 LArray<> * lt_hashtable_get_values(LHashtable<> * self)
 {
-    g_return_val_if_fail(self != NULL, NULL); 
-    return self->GetValues();
+    LT_RETURN_CALL_SELF_CPP(GetValues, NULL);
 }
 
 static void _lt_hashtable_append_key_cb(const void * key, const void * value, void * user_arg)
