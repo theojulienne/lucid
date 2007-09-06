@@ -47,17 +47,21 @@ int main(int argc, char ** argv)
     
     id1 = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee, NULL);
 
-    g_assert(id1);
+    g_assert(id1 > 0);
 
-    id2 = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee, NULL);
+ //   id2 = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee, NULL);
    
-    g_assert(id2);
+  //  g_assert(id2 > 0);
 
-    g_assert(lt_object_remove_handler(obj, id1));   
+  //  g_print("%s: id1 = %d, id2 = %d\n", __FUNCTION__, id1, id2);
+
+      g_print("%s: %d\n", __FUNCTION__, lt_object_find_handler(obj, _test_foo, (void *)0xc0ffee));
+
+      g_assert(lt_object_remove_handler(obj, id1));   
   
-    g_assert(lt_object_remove_handler(obj, id2));
+      g_print("%s: %d\n", __FUNCTION__, lt_object_find_handler(obj, _test_foo, (void *)0xc0ffee));
 
-    lt_object_find_handler(obj, _test_foo, (void *)0xc0ffee);
+ //   g_assert(lt_object_remove_handler(obj, id2));
 
     lt_base_unref(LT_BASE(obj));
 

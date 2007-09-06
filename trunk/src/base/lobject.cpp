@@ -42,8 +42,13 @@ LObject::~LObject()
     for(int i = 0, len = handlers->Count(); i < len; i++)   
     {
         handler = handlers->GetItem(i);
-	    for (GSList * l = handler; l; l = l->next)
+	    
+        if(! handler)
+            continue;
+        
+        for (GSList * l = handler; l; l = l->next)
             g_free(l->data);
+        
         g_slist_free(handler);                    
     }
 
@@ -52,19 +57,12 @@ LObject::~LObject()
 
 void LObject::SetupEvents()
 {
-    LType * type;
-
     this->m_events = new LHashtable<char *, GSList *>(TRUE, NULL);
 
-    for(type = this->m_type; type != NULL; type = type->GetParent())
+    for(LType * type = this->m_type; type != NULL; type = type->GetParent())
     {
-        LArray<char *> * events;    
-        int i, len;
-
-        events = type->GetEvents();   
-        len = events->Count();
-
-        for(i = 0; i < len; i++)
+        LArray<char *> * events = type->GetEvents();   
+        for(int i = 0, len = events->Count(); i < len; i++)
             this->m_events->Insert(sstrdup(events->GetItem(i)), NULL);
     }    
 }
@@ -108,7 +106,7 @@ bool_t LObject::RemoveHandler (LEventID event_id)
 
     for(int i = 0, len = pairs->Count(); i < len; i++)
     {
-        l = pairs->GetItem(i)->Value;
+        l = event_handlers = pairs->GetItem(i)->Value;     
         event_name = pairs->GetItem(i)->Key;
 
         if(l == NULL || event_name == NULL)
@@ -119,10 +117,12 @@ bool_t LObject::RemoveHandler (LEventID event_id)
             if((uint64_t)l->data == event_id)
             {
                 handler = (LEventHandler *)l->data;
-                break;
+                goto found_handler;
             }
         }
     }
+
+found_handler:
 
     delete pairs;
 
@@ -133,21 +133,33 @@ bool_t LObject::RemoveHandler (LEventID event_id)
         handler->val_free_fn(handler->user_data);
     g_free(handler);
 
-//    g_print("%s: %d\n", __FUNCTION__, g_slist_length(event_handlers));
     event_handlers = g_slist_delete_link (event_handlers, l); 
-//    g_print("%s: %d\n", __FUNCTION__, g_slist_length(event_handlers));   
-    this->m_events->Insert(event_name, event_handlers);
+    this->m_events->Insert(sstrdup(event_name), event_handlers);
 
     return TRUE;
 }
 
 LEventID LObject::FindHandler(lt_object_event_func * event_func, void * user_data)
 {
-   /* LArray<GSList 
+    LArray<GSList *> * values = this->m_events->GetValues();
+    LEventID event_id = 0;
+
     for(int i = 0, len = values->Count(); i < len; i++)
-        g_print("%s = %p\n", pairs->GetItem(i)->Key, (void *)pairs->GetItem(i)->Value); 
-    delete values;
-    */return 0;
+    {
+        for(GSList * l = values->GetItem(i); l; l = l->next)
+        {
+            LEventHandler * handler = (LEventHandler *)l->data;
+            if(handler->event_func == event_func && handler->user_data == user_data)
+            {
+                event_id = (LEventID)handler;
+                goto found_id;            
+            }
+        }    
+    }
+
+found_id:
+    delete values;    
+    return event_id;
 }
 
 void LObject::SendRaw(char * event_name, LEvent * args)
