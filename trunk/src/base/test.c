@@ -30,8 +30,9 @@ static void hash_test()
 
     for(i = 0; i < len; i++)
     {
-        void * key = lt_array_get_item(keys, i);
-        printf("%s = %d\n", key, lt_hashtable_lookup(hash, key));
+        // THIS LINE WILL COST YOU HOURS. BE CAREFUL.
+        char * key = (char *) * (void **)lt_array_get_item(keys, i);
+        printf("%s = %d\n", key, lt_hashtable_lookup(hash, (void *)key));
     }
     
     lt_array_destroy(keys);
@@ -63,10 +64,39 @@ static void module_test()
     lt_base_unref(LT_BASE(module));
 }
 
+static void array_test()
+{
+    int i, len;
+    double x;
+    LArray * array = lt_array_create(NULL, sizeof(double));
+    x = 1;    
+    lt_array_append(array, &x);
+    x = 2;
+    lt_array_append(array, &x);
+    x = 3;    
+    lt_array_append(array, &x);
+
+  //  x = 4;
+  //  lt_array_set_item(array, 0, &x);
+
+    lt_array_reverse(array);
+
+    len = lt_array_count(array);
+
+    printf("%d\n", len);
+
+    for(i = 0; i < len; i++)
+        printf("%f\n", * (double *)lt_array_get_item(array, i));
+
+    lt_array_destroy(array);
+}
+
 int main(int argc, char ** argv)
 {
     LObject * obj;
     LEventID id1, id2;
+
+    array_test();
 
     //g_mem_set_vtable(glib_mem_profiler_table);
     
@@ -82,26 +112,26 @@ int main(int argc, char ** argv)
 
     g_assert(id1 > 0);
 
- //   id2 = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee, NULL);
+    id2 = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xdeadbeef, NULL);
    
   //  g_assert(id2 > 0);
 
   //  g_print("%s: id1 = %d, id2 = %d\n", __FUNCTION__, id1, id2);
 
-      g_print("%s: %d\n", __FUNCTION__, lt_object_find_handler(obj, _test_foo, (void *)0xc0ffee));
+    g_print("%s: %d\n", __FUNCTION__, lt_object_find_handler(obj, _test_foo, (void *)0xc0ffee));
 
-      g_assert(lt_object_remove_handler(obj, id1));   
+    g_assert(lt_object_remove_handler(obj, id1));   
   
-      g_print("%s: %d\n", __FUNCTION__, lt_object_find_handler(obj, _test_foo, (void *)0xc0ffee));
+    g_print("%s: %d\n", __FUNCTION__, lt_object_find_handler(obj, _test_foo, (void *)0xdeadbeef));
 
- //   g_assert(lt_object_remove_handler(obj, id2));
-
-    lt_base_unref(LT_BASE(obj));
-
-/*    obj = (LObject *)lt_type_create_instance(lt_type_from_name("LObject"));
+    g_assert(lt_object_remove_handler(obj, id2));
 
     lt_base_unref(LT_BASE(obj));
-*/
+
+//    obj = (LObject *)lt_type_create_instance(lt_type_from_name("LObject"));
+
+//    lt_base_unref(LT_BASE(obj));
+
     //g_mem_profile ();
 
     return 0;

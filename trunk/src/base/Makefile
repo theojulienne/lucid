@@ -9,4 +9,5 @@ clean:
 	rm -f *.o
 	rm -f *.a
 	rm -f test
+	rm -f liblt-base.so
 	rm -f *~

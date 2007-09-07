@@ -18,6 +18,14 @@ typedef int bool_t;
 typedef uint64_t LEventID;
 #endif
 
+#ifndef lt_hashtable_pair
+typedef struct 
+{
+    void * key;
+    void * value;
+} lt_hashtable_pair;
+#endif
+
 #ifdef __cplusplus
 
 static inline char * sstrdup(char * s)
@@ -74,7 +82,7 @@ typedef void LArray;
 
 typedef int lt_array_compare_func(const void * value1, const void * value2);
 
-LArray * lt_array_create(void (* val_free_fn) (void *));
+LArray * lt_array_create(void (* val_free_fn) (void *), int elem_size);
 void lt_array_destroy(LArray * self);
 void lt_array_append(LArray * self, void * value);
 void lt_array_insert(LArray * self, int index, void * value);

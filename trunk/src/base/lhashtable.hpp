@@ -115,7 +115,7 @@ public:
     bool_t Remove(const K key);
     LArray<K> * GetKeys();
     LArray<V> * GetValues();    
-    LArray<LHashtableEntry<K, V> *> * GetPairs();
+    LArray< LHashtableEntry<K, V> > * GetPairs();
 };
 
 template <class K, class V>
@@ -171,9 +171,9 @@ inline LArray<V> * LHashtable<K, V>::GetValues()
 }
 
 template <class K, class V>
-inline LArray<LHashtableEntry<K, V> *> * LHashtable<K, V>::GetPairs()
+inline LArray< LHashtableEntry<K, V> > * LHashtable<K, V>::GetPairs()
 {
-    return reinterpret_cast<LArray<LHashtableEntry<K, V> *> *>(LHashtableImpl::GetPairs());    
+    return reinterpret_cast<LArray<LHashtableEntry<K, V> > *>(LHashtableImpl::GetPairs());    
 }
 
 #endif

@@ -2,11 +2,14 @@
 #define __LUCID_LARRAY_H__
 
 #include <glib.h>
+#include <string.h>
+
+#define LT_ARRAY_INDEX(i) (void *)(((this->m_impl)->data) + this->m_elem_size * (i))
 
 class LArrayImpl
 {
 public:
-    LArrayImpl(void (* val_free_fn) (void *));
+    LArrayImpl(void (* val_free_fn) (void *), int elem_size);
     ~LArrayImpl();
     void Append(void * value);
     void Insert(int i, void * value);
@@ -20,58 +23,56 @@ public:
     void * GetItem(int i);
     void SetItem(int i, void * value);      
     void Clear();
-    int Count();    
+    int Count();   
+ 
 private:
-    void * impl;
-    void (* val_free_fn) (void *);
+    GArray * m_impl;
+    int m_elem_size;
+    void (* m_val_free_fn) (void *);
 };
 
 
 inline void LArrayImpl::Append(void * value)
 {
-    g_ptr_array_add((GPtrArray *)this->impl, value);
+    g_array_append_vals(this->m_impl, value, 1);
 }
 
+//FIXME
 inline bool_t LArrayImpl::Remove(void * value)
 {
-    return (bool_t)g_ptr_array_remove((GPtrArray *)this->impl, value);
+    return TRUE;//g_ptr_array_remove((GPtrArray *)this->m_impl, value);
 }
 
 inline bool_t LArrayImpl::RemoveIndex(int i)
 {
-    return (bool_t)g_ptr_array_remove_index((GPtrArray *)this->impl, i); 
+    g_array_remove_index(this->m_impl, i);
+    return TRUE;
 }
 
 inline void LArrayImpl::Sort(int (* list_compare_func) (const void * value1, 
                                             const void * value2))
 {
-    g_ptr_array_sort((GPtrArray *)this->impl, (GCompareFunc)list_compare_func);    
+    g_array_sort(this->m_impl, (GCompareFunc)list_compare_func);    
 }
 
-inline void LArrayImpl::Foreach(void (* list_foreach_func) (const void * value, void * user_arg), 
-                    void * user_arg)
-{
-    g_ptr_array_foreach((GPtrArray *)this->impl, (GFunc)list_foreach_func, user_arg);
-}
-    
 inline void * LArrayImpl::GetItem(int i)
 {
-    return g_ptr_array_index((GPtrArray *)this->impl, i);
+    return LT_ARRAY_INDEX(i);
 }
-
+    
 inline void LArrayImpl::SetItem(int i, void * value)
 {
-    g_ptr_array_index((GPtrArray *)this->impl, i) = value;
+    memmove(LT_ARRAY_INDEX(i), value, this->m_elem_size);
 }
 
 inline void LArrayImpl::Clear()
 {
-    g_ptr_array_remove_range((GPtrArray *)this->impl, 0, ((GPtrArray *)this->impl)->len);
+    g_array_remove_range(this->m_impl, 0, this->m_impl->len);
 }
 
 inline int LArrayImpl::Count()
 {
-    return ((GPtrArray *)this->impl)->len;
+    return this->m_impl->len;
 }
 
 
@@ -89,38 +90,38 @@ public:
 
 
 template <class V> 
-inline LArray<V>::LArray(void (* val_free_fn) (void *)): LArrayImpl(val_free_fn)
+inline LArray<V>::LArray(void (* val_free_fn) (void *)): LArrayImpl(val_free_fn, sizeof(V))
 {
 }
 
 template <class V>
 inline void LArray<V>::Append(V value)
 {
-    LArrayImpl::Append((void *)value);
+    LArrayImpl::Append((void *)&value);
 }
 
 template <class V>
 inline void LArray<V>::Insert(int i, V value)
 {
-    LArrayImpl::Insert(i, (void *)value);
+    LArrayImpl::Insert(i, (void *)&value);
 }
 
 template <class V>
 inline bool_t LArray<V>::Remove(V value)
 {
-    return LArrayImpl::Remove((void *)value);
+    return LArrayImpl::Remove((void *)&value);
 }
 
 template <class V>
 inline V LArray<V>::GetItem(int i)
 {
-    return (V)LArrayImpl::GetItem(i);
+    return (V) * (V *)LArrayImpl::GetItem(i);
 }
 
 template <class V>
 inline void LArray<V>::SetItem(int i, V value)
 {
-    LArrayImpl::SetItem(i, (void *)value);
+    LArrayImpl::SetItem(i, (void *)&value);
 }
 
 /*

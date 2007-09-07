@@ -16,11 +16,6 @@ public:
     void (* val_free_fn) (void *);
 };
 
-static void _lt_object_events_free(void * value)
-{
-    
-}
-
 LT_DEFINE_TYPE(LObject, lt_object, NULL);
 
 bool_t LObject::RegisterEvents(LType * type)
@@ -73,9 +68,15 @@ LEventID LObject::AddHandler(char * event_name, lt_object_event_func * event_fun
     char * orig_key;
     GSList * event_handlers;
     LEventHandler * handler;
+    LEventID event_id;
 
     g_return_val_if_fail(event_name != NULL, 0);
     g_return_val_if_fail(event_func != NULL, 0);
+
+    event_id = this->FindHandler(event_func, user_data);
+    
+    if(event_id != 0)
+        return event_id;
 
     if(! this->m_events->LookupExtended(event_name, &orig_key, &event_handlers))
         return 0;
@@ -95,7 +96,7 @@ LEventID LObject::AddHandler(char * event_name, lt_object_event_func * event_fun
 
 bool_t LObject::RemoveHandler (LEventID event_id)
 {
-    LArray<LHashtableEntry<char *, GSList *> *> * pairs; 
+    LArray<LHashtableEntry<char *, GSList *> > * pairs; 
     LEventHandler * handler = NULL;
     GSList * l, * event_handlers;
     char * event_name = NULL;
@@ -106,8 +107,8 @@ bool_t LObject::RemoveHandler (LEventID event_id)
 
     for(int i = 0, len = pairs->Count(); i < len; i++)
     {
-        l = event_handlers = pairs->GetItem(i)->Value;     
-        event_name = pairs->GetItem(i)->Key;
+        l = event_handlers = pairs->GetItem(i).Value;     
+        event_name = pairs->GetItem(i).Key;
 
         if(l == NULL || event_name == NULL)
             continue;
