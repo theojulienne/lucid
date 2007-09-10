@@ -34,3 +34,4 @@ flags
 		cflags "-g -DPIC -Wall"
 	platform all
 		include "#src/base"
+		cflags "-finline"
