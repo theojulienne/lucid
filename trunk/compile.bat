@@ -1,0 +1,1 @@
+@bscripts/compile %*

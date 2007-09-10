@@ -1,0 +1,88 @@
+info
+	name "lucid.base"
+	description "Lucid Toolkit - Base Module"
+	version "0.1"
+
+targets
+	library lt-base
+		sources
+			atomic.c
+			larray.cpp
+			lbase.cpp
+			lhashtable.cpp
+			lmodule.cpp
+			lobject.cpp
+			lobject.cpp
+			ltype.cpp
+			platform !posix
+				eglib/src/garray.c
+				eglib/src/gdate.c
+				eglib/src/gdir.c
+				eglib/src/gerror.c
+				eglib/src/gfile.c
+				eglib/src/ghashtable.c
+				eglib/src/glist.c
+				eglib/src/gmarkup.c
+				eglib/src/gmem.c
+				eglib/src/gmisc.c
+				eglib/src/gmodule.c
+				eglib/src/goutput.c
+				eglib/src/gpath.c
+				eglib/src/gpattern.c
+				eglib/src/gptrarray.c
+				eglib/src/gqueue.c
+				eglib/src/gshell.c
+				eglib/src/gslist.c
+				eglib/src/gspawn.c
+				eglib/src/gstr.c
+				eglib/src/gstring.c
+				eglib/src/gtimer.c
+				eglib/src/gunicode.c
+				eglib/src/gutf8.c
+			platform win32
+				eglib/src/vasprintf.c
+		includes
+			atomic.h
+			larray.hpp
+			lbase.hpp
+			lhashtable.hpp
+			lmodule.hpp
+			lobject.hpp
+			lobject.hpp
+			ltype.hpp
+			platform !posix
+				eglib/src/glib.h
+				eglib/src/gmodule.h
+	
+
+contains
+	none
+
+options
+	none
+
+depends
+	platform win32
+		none
+	platform darwin
+		none
+	platform posix
+		none
+	platform all
+		none
+
+flags
+	platform darwin
+		library "iconv"
+	platform posix
+		pkg-config "glib-2.0 gmodule-2.0"
+	platform win32
+		library "psapi"
+		library "wsock32"
+		ldflags "-Wl,--export-all-symbols"
+	platform !posix
+		include "#src/base/eglib/src"
+		include "#src/base/ac"
+		define NEEDS_GLIB
+	platform all
+		define "COMPILING_BASE"
