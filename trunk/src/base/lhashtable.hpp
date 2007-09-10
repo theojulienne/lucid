@@ -57,15 +57,9 @@ inline LHashtableImpl::~LHashtableImpl()
 
 inline void LHashtableImpl::Insert(void * key, void * value)
 {
-#ifdef REAL_GLIB
-    g_hash_table_insert((GHashTable *)this->impl, 
-                                (void *)key, 
-                                (void *)value, FALSE);    
-#else
     g_hash_table_insert((GHashTable *)this->impl, 
                                 (void *)key, 
                                 (void *)value);
-#endif
 }
 
 inline void * LHashtableImpl::Lookup(const void * key)
