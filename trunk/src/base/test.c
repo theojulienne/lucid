@@ -91,10 +91,34 @@ static void array_test()
     lt_array_destroy(array);
 }
 
+static void base64_init()
+{
+    const unsigned char orig[4] = { 0, 1, 2, 3 };
+    
+    unsigned char * bin;
+    char * b64;
+    int len, i;
+
+    b64 = lt_base64_encode(orig, 4);
+    g_assert(b64 != NULL);    
+
+    bin = lt_base64_decode(b64, &len);
+    g_assert(bin != NULL);
+
+    g_assert(sizeof(orig));
+    for(i = 0; i < sizeof(orig); i++)
+        g_assert(bin[i] == orig[i]);    
+
+    g_free(b64);
+    g_free(bin);
+}
+
 int main(int argc, char ** argv)
 {
     LObject * obj;
     LEventID id1, id2;
+
+    base64_init();
 
     array_test();
 

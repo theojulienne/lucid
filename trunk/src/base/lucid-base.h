@@ -26,6 +26,15 @@ typedef struct
 } lt_hashtable_pair;
 #endif
 
+// FUNCTIONS
+
+G_BEGIN_DECLS
+
+char * lt_base64_encode(const unsigned char * in, int len);
+unsigned char * lt_base64_decode(const char * in, int * len);
+
+G_END_DECLS
+
 #ifdef __cplusplus
 
 static inline char * sstrdup(char * s)
