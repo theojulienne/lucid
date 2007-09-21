@@ -6,12 +6,11 @@ info
 targets
 	library lt-base
 		sources
-			atomic.c
+			atomic.cpp
 			larray.cpp
 			lbase.cpp
 			lhashtable.cpp
 			lmodule.cpp
-			lobject.cpp
 			lobject.cpp
 			ltype.cpp
 			platform !posix
