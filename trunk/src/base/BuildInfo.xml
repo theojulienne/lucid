@@ -8,58 +8,58 @@
     <target>    
 		<sources>
             <platform n="all">
-			    <f n="atomic.cpp" />
-			    <f n="larray.cpp" />
-			    <f n="lbase.cpp" />
-			    <f n="lhashtable.cpp" />
-			    <f n="lmodule.cpp" />
-			    <f n="lobject.cpp" />
-			    <f n="ltype.cpp" />
+			    <src n="atomic.cpp" />
+			    <src n="larray.cpp" />
+			    <src n="lbase.cpp" />
+			    <src n="lhashtable.cpp" />
+			    <src n="lmodule.cpp" />
+			    <src n="lobject.cpp" />
+			    <src n="ltype.cpp" />
             </platform>
 			<platform n="!posix">
-				<f n="eglib/src/garray.c" />
-				<f n="eglib/src/gdate.c" />
-				<f n="eglib/src/gdir.c" />
-				<f n="eglib/src/gerror.c" />
-				<f n="eglib/src/gfile.c" />
-				<f n="eglib/src/ghashtable.c" />
-				<f n="eglib/src/glist.c" />
-				<f n="eglib/src/gmarkup.c" />
-				<f n="eglib/src/gmem.c" />
-				<f n="eglib/src/gmisc.c" />
-				<f n="eglib/src/gmodule.c" />
-				<f n="eglib/src/goutput.c" />
-				<f n="eglib/src/gpath.c" />
-				<f n="eglib/src/gpattern.c" />
-				<f n="eglib/src/gptrarray.c" />
-				<f n="eglib/src/gqueue.c" />
-				<f n="eglib/src/gshell.c" />
-				<f n="eglib/src/gslist.c" />
-				<f n="eglib/src/gspawn.c" />
-				<f n="eglib/src/gstr.c" />
-				<f n="eglib/src/gstring.c" />
-				<f n="eglib/src/gtimer.c" />
-				<f n="eglib/src/gunicode.c" />
-				<f n="eglib/src/gutf8.c" />
+				<src n="eglib/src/garray.c" />
+				<src n="eglib/src/gdate.c" />
+				<src n="eglib/src/gdir.c" />
+				<src n="eglib/src/gerror.c" />
+				<src n="eglib/src/gfile.c" />
+				<src n="eglib/src/ghashtable.c" />
+				<src n="eglib/src/glist.c" />
+				<src n="eglib/src/gmarkup.c" />
+				<src n="eglib/src/gmem.c" />
+				<src n="eglib/src/gmisc.c" />
+				<src n="eglib/src/gmodule.c" />
+				<src n="eglib/src/goutput.c" />
+				<src n="eglib/src/gpath.c" />
+				<src n="eglib/src/gpattern.c" />
+				<src n="eglib/src/gptrarray.c" />
+				<src n="eglib/src/gqueue.c" />
+				<src n="eglib/src/gshell.c" />
+				<src n="eglib/src/gslist.c" />
+				<src n="eglib/src/gspawn.c" />
+				<src n="eglib/src/gstr.c" />
+				<src n="eglib/src/gstring.c" />
+				<src n="eglib/src/gtimer.c" />
+				<src n="eglib/src/gunicode.c" />
+				<src n="eglib/src/gutf8.c" />
             </platform>
 			<platform n="win32">
-				<f n="eglib/src/vasprintf.c" />
+				<src n="eglib/src/vasprintf.c" />
             </platform>
         </sources>
 		<includes>
             <platform n="all">
-			    <f n="atomic.h" />
-			    <f n="larray.hpp" />
-			    <f n="lbase.hpp" />
-			    <f n="lhashtable.hpp" />
-			    <f n="lmodule.hpp" />
-			    <f n="lobject.hpp" />
-			    <f n="lobject.hpp" />
-			    <f n="ltype.hpp" />
+			    <src n="atomic.h" />
+			    <src n="larray.hpp" />
+			    <src n="lbase.hpp" />
+			    <src n="lhashtable.hpp" />
+			    <src n="lmodule.hpp" />
+			    <src n="lobject.hpp" />
+			    <src n="lobject.hpp" />
+			    <src n="ltype.hpp" />
             </platform>
 			<platform n="!posix">
-				<f n="eglib/src/glib.h" />
-				<f n="eglib/src/gmodule.h" />
+				<src n="eglib/src/glib.h" />
+				<src n="eglib/src/gmodule.h" />
 	        </platform>
         </includes>
         <contains />
