@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project>
+    <info>
+        <entry n="name" v="lt-base" />
+        <entry n="description" v="Lucid Toolkit - Base Module" />
+        <entry n="version" v="0.1" />
+    </info>
+    <target>    
+		<sources>
+            <platform n="all">
+			    <f n="atomic.cpp" />
+			    <f n="larray.cpp" />
+			    <f n="lbase.cpp" />
+			    <f n="lhashtable.cpp" />
+			    <f n="lmodule.cpp" />
+			    <f n="lobject.cpp" />
+			    <f n="ltype.cpp" />
+            </platform>
+			<platform n="!posix">
+				<f n="eglib/src/garray.c" />
+				<f n="eglib/src/gdate.c" />
+				<f n="eglib/src/gdir.c" />
+				<f n="eglib/src/gerror.c" />
+				<f n="eglib/src/gfile.c" />
+				<f n="eglib/src/ghashtable.c" />
+				<f n="eglib/src/glist.c" />
+				<f n="eglib/src/gmarkup.c" />
+				<f n="eglib/src/gmem.c" />
+				<f n="eglib/src/gmisc.c" />
+				<f n="eglib/src/gmodule.c" />
+				<f n="eglib/src/goutput.c" />
+				<f n="eglib/src/gpath.c" />
+				<f n="eglib/src/gpattern.c" />
+				<f n="eglib/src/gptrarray.c" />
+				<f n="eglib/src/gqueue.c" />
+				<f n="eglib/src/gshell.c" />
+				<f n="eglib/src/gslist.c" />
+				<f n="eglib/src/gspawn.c" />
+				<f n="eglib/src/gstr.c" />
+				<f n="eglib/src/gstring.c" />
+				<f n="eglib/src/gtimer.c" />
+				<f n="eglib/src/gunicode.c" />
+				<f n="eglib/src/gutf8.c" />
+            </platform>
+			<platform n="win32">
+				<f n="eglib/src/vasprintf.c" />
+            </platform>
+        </sources>
+		<includes>
+            <platform n="all">
+			    <f n="atomic.h" />
+			    <f n="larray.hpp" />
+			    <f n="lbase.hpp" />
+			    <f n="lhashtable.hpp" />
+			    <f n="lmodule.hpp" />
+			    <f n="lobject.hpp" />
+			    <f n="lobject.hpp" />
+			    <f n="ltype.hpp" />
+            </platform>
+			<platform n="!posix">
+				<f n="eglib/src/glib.h" />
+				<f n="eglib/src/gmodule.h" />
+	        </platform>
+        </includes>
+        <contains />
+        <options />
+        <depends />
+        <flags>
+	        <platform n="darwin">
+		        <lib n="iconv" />
+            </platform>
+	        <platform n="posix">
+		        <pkg-config n="glib-2.0 gmodule-2.0" />
+            </platform>
+	        <platform n="win32">
+		        <lib n="psapi" />
+		        <lib n="wsock32" />
+		        <ldflags v="-Wl,--export-all-symbols" />
+            </platform>	        
+            <platform n="!posix">
+		        <inc n="#src/base/eglib/src" />
+		        <inc n="#src/base/ac" />
+		        <def v="NEEDS_GLIB" />
+            </platform>
+	        <platform n="all">
+		        <def v="COMPILING_BASE" />
+            </platform>
+        </flags>
+    </target>
+</project>
+
