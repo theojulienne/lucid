@@ -1,0 +1,23 @@
+info
+	name "lucid.tests"
+	description "Lucid Tests"
+	version "0.1"
+
+targets
+	application test1
+		sources
+			test1.c
+
+flags
+	library "lt-base"
+	libdir "#src"
+	libdir "#src/base"
+	platform darwin
+		(cairo) cflags "-I/usr/local/include/cairo -I/usr/include/cairo"
+		(cairo) ldflags "-L/usr/local/lib -lcairo"
+	platform posix
+		pkg-config "gtk+-2.0 gdk-2.0"
+		(cairo) pkg-config "cairo"
+	platform all
+		(!cairo) define NO_CAIRO
+        cflags "-Wall -g"

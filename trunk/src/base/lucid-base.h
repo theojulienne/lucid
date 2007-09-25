@@ -30,6 +30,8 @@ typedef struct
 
 G_BEGIN_DECLS
 
+void lt_type_init();
+
 char * lt_base64_encode(const unsigned char * in, int len);
 unsigned char * lt_base64_decode(const char * in, int * len);
 
@@ -73,8 +75,6 @@ static inline char * sstrdup(char * s)
 #include <lobject.hpp>
 
 #else
-
-void lt_type_init();
 
 typedef void LType;
 

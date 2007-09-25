@@ -46,6 +46,7 @@ bool_t call_me_in_module_test()
 
 static void module_test()
 {
+/*
     LModule * module = lt_module_load(NULL);
     bool_t (* func) ();
 
@@ -62,6 +63,7 @@ static void module_test()
     g_assert(func());
 
     lt_base_unref(LT_BASE(module));
+*/
 }
 
 static void array_test()
@@ -130,7 +132,9 @@ int main(int argc, char ** argv)
 
     module_test();
 
-    obj = lt_object_create();
+    //obj = lt_object_create();
+    //lt_type_from_name test
+    obj = (LObject *)lt_type_create_instance(lt_type_from_name("LObject"));
     
     id1 = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee, NULL);
 
@@ -151,8 +155,6 @@ int main(int argc, char ** argv)
     g_assert(lt_object_remove_handler(obj, id2));
 
     lt_base_unref(LT_BASE(obj));
-
-//    obj = (LObject *)lt_type_create_instance(lt_type_from_name("LObject"));
 
 //    lt_base_unref(LT_BASE(obj));
 

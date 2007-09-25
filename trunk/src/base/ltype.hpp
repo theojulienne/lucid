@@ -22,7 +22,6 @@ public:
     static void * CreateInstance(LType * type);  
     static LType * FromName(const char * klass_name);     
 
-
 private:
     LArray<char *> * m_events;
     const char * m_klass_name; 

@@ -8,6 +8,7 @@ targets
 
 contains
 	recurse base src/base
+	recurse test test
 
 depends
 	platform win32

@@ -9,6 +9,7 @@ targets
 			atomic.cpp
 			larray.cpp
 			lbase.cpp
+			lbase64.cpp
 			lhashtable.cpp
 			lmodule.cpp
 			lobject.cpp
