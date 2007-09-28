@@ -7,6 +7,9 @@ targets
 	application test1
 		sources
 			test1.c
+	application xml_test
+		sources 
+			xml_test.c
 
 flags
 	library "lt-base"

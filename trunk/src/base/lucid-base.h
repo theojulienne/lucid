@@ -73,8 +73,12 @@ static inline char * sstrdup(char * s)
 #include <lmodule.hpp>
 #include <lhashtable.hpp>
 #include <lobject.hpp>
+#include <lxml.hpp>
 
 #else
+
+//FIXME- implement this
+typedef void LError;
 
 typedef void LType;
 
@@ -139,6 +143,16 @@ LEventID lt_object_add_handler(LObject * self, char * event_name,
     lt_object_event_func * event_func, void * user_data, void (* val_free_fn) (void *));
 bool_t lt_object_remove_handler(LObject * self, LEventID event_id);
 LEventID lt_object_find_handler(LObject * self, lt_object_event_func * event_func, void * user_data); 
+
+typedef void LXml;
+
+typedef void lt_xml_event_func(const char * element, const char ** attr_names,
+	const char ** attr_values, void * user_data);
+
+LXml * lt_xml_create(lt_xml_event_func * start_func, lt_xml_event_func * end_func, 
+		lt_xml_event_func * text_func, void * user_data, void (* val_free_fn) (void *));
+bool_t lt_xml_parse_buffer(LXml * self, const char * data, int len, bool_t is_final, LError ** err);
+bool_t lt_xml_parse_file(LXml * self, const char * file_name, LError ** err);
 
 #endif
 

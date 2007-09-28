@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<city>
+        <cityName type="boring" >
+		<adminUnit>Cayo</adminUnit>
+	</cityName>
+        <country>Belize</country>
+        <population bar="foo" >11100</population>
+        <area>5</area>
+        <elevation>130</elevation>
+        <longitude>88.44</longitude>
+        <latitude>17.27</latitude>
+</city>

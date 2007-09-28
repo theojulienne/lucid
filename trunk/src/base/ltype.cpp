@@ -9,7 +9,7 @@
     } \
     G_STMT_END
 
-//LObject -> lt_object
+//LObject -> lt_object .. Does this even need to be public?
 extern "C" char * _lt_type_format_name(const char * klass_name)
 {
 	GString * name = g_string_new(klass_name);
@@ -102,6 +102,9 @@ void * LType::CreateInstance(LType * type)
 //This may look nasty...but is is extremely powerful. Our type system only exists at runtime.
 //So we have a 'chicken and the egg' issue of needing the LType,
 //before we have created an instance of the given type.
+//
+// We are actually putting a call to _register_type() in the .init section, so this can actually be avoided.
+// But LModule::GetSymbolInProcess() STILL should be implemented. 
 LType * LType::FromName(const char * klass_name)
 {
     g_assert(_lt_type_table != NULL && _lt_this_module != NULL);
