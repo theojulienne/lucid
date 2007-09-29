@@ -31,7 +31,7 @@ extern "C" char * _lt_type_format_name(const char * klass_name)
 	return g_string_free(name, FALSE);
 }
 
-extern "C" 
+extern "C"  
 {
 void lt_type_init();
 void * lt_type_create_instance(LType * type);

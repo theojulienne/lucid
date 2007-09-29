@@ -18,6 +18,7 @@ void * lt_array_get_item(LArrayImpl * self, int index);
 void lt_array_set_item(LArrayImpl * self, int index, void * value);
 void lt_array_clear(LArrayImpl * self);
 int lt_array_count(LArrayImpl * self);
+char * lt_array_get_data(LArrayImpl * self);
 }
 
 LArrayImpl::LArrayImpl(void (* val_free_fn) (void *), int elem_size): m_elem_size(elem_size)
@@ -172,4 +173,10 @@ int lt_array_count(LArrayImpl * self)
     g_return_val_if_fail(self != NULL, -1);
     return self->Count();
 }
-    
+ 
+char * lt_array_get_data(LArrayImpl * self)
+{
+   g_return_val_if_fail(self != NULL, NULL);
+   return self->GetData();	
+}
+   

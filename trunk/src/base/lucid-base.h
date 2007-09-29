@@ -110,6 +110,7 @@ void * lt_array_get_item(LArray * self, int index);
 void lt_array_set_item(LArray * self, int index, void * value);
 void lt_array_clear(LArray * self);
 int lt_array_count(LArray * self);
+char * lt_array_get_data(LArray * self);
 
 typedef void LHashtable;
 

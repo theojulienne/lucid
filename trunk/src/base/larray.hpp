@@ -23,8 +23,9 @@ public:
     void * GetItem(int i);
     void SetItem(int i, void * value);      
     void Clear();
-    int Count();   
- 
+    int Count(); 
+    char * GetData();
+    	   
 private:
     GArray * m_impl;
     int m_elem_size;
@@ -75,6 +76,10 @@ inline int LArrayImpl::Count()
     return this->m_impl->len;
 }
 
+inline char * LArrayImpl::GetData()
+{
+	return this->m_impl->data;
+}
 
 template <class V = void *> class LArray: public LArrayImpl
 {
@@ -85,7 +90,8 @@ public:
     bool_t Remove(V value);
     V GetItem(int i);
     void SetItem(int i, V value);
-//    V & operator[](int i);
+//    V & operator[](int i); 
+    V * GetData();
 };
 
 
@@ -122,6 +128,12 @@ template <class V>
 inline void LArray<V>::SetItem(int i, V value)
 {
     LArrayImpl::SetItem(i, (void *)&value);
+}
+
+template <class V>
+inline V * LArray<V>::GetData()
+{
+    return (V *)LArrayImpl::GetData();
 }
 
 /*
