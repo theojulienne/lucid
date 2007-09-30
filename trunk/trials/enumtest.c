@@ -40,7 +40,7 @@ enum enum_type func_prefix ## _from_index( int index ) \
 } \
 lt_enum_def_t lt_ ## enum_type ## _enum_lookup[] =
 
-#define I(name) { name, #name }
+#define LT_E(name) { name, #name }
 #define LT_ENUM_END { 0, NULL }
 
 typedef struct
@@ -58,9 +58,9 @@ enum Test
 
 LT_DEFINE_ENUM( Test, test )
 {
-	I( lFoo ),
-	I( lBar ),
-	I( lBaz ),
+	LT_E( lFoo ),
+	LT_E( lBar ),
+	LT_E( lBaz ),
 	LT_ENUM_END
 };
 
