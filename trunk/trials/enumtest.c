@@ -24,6 +24,11 @@ enum enum_type func_prefix ## _from_string( const char *strval ) \
 } \
 int func_prefix ## _get_num( ) \
 { \
+	static int length = -1; \
+	\
+	if ( length != -1 ) \
+		return length; \
+	\
 	int a; \
 	for ( a = 0; lt_ ## enum_type ## _enum_lookup[a].strval != NULL; a++ ) \
 		;\
@@ -34,6 +39,9 @@ enum enum_type func_prefix ## _from_index( int index ) \
 	return lt_ ## enum_type ## _enum_lookup[index].value; \
 } \
 lt_enum_def_t lt_ ## enum_type ## _enum_lookup[] =
+
+#define I(name) { name, #name }
+#define LT_ENUM_END { 0, NULL }
 
 typedef struct
 {
@@ -50,10 +58,10 @@ enum Test
 
 LT_DEFINE_ENUM( Test, test )
 {
-	{ lFoo, "lFoo" },
-	{ lBar, "lBar" },
-	{ lBaz, "lBaz" },
-	{ 0, NULL },
+	I( lFoo ),
+	I( lBar ),
+	I( lBaz ),
+	LT_ENUM_END
 };
 
 int main( int argc, char *argv[] )
