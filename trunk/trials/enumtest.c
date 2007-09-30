@@ -1,7 +1,46 @@
 #include <stdio.h>
 
+typedef struct
+{
+	const char *name;
+	const char *(*to_string)( int val );
+	int (*from_string)( const char *val );
+	int (*get_num)( );
+	int (*from_index)( int index );
+} lt_enum_type_info;
+
+const char *enum_get_name( lt_enum_type_info *type )
+{
+	return type->name;
+}
+
+const char *enum_to_string( lt_enum_type_info *type, int val )
+{
+	return type->to_string( val );
+}
+
+int enum_from_string( lt_enum_type_info *type, const char * val )
+{
+	return type->from_string( val );
+}
+
+int enum_get_num( lt_enum_type_info *type )
+{
+	return type->get_num( );
+}
+
+int enum_from_index( lt_enum_type_info *type, int index )
+{
+	return type->from_index( index );
+}
+
 #define LT_DEFINE_ENUM(enum_type,func_prefix) \
 extern lt_enum_def_t lt_ ## enum_type ## _enum_lookup[]; \
+extern lt_enum_type_info lt_ ## func_prefix ## _enum_type_info; \
+lt_enum_type_info * func_prefix ## _get_struct( ) \
+{ \
+	return &lt_ ## func_prefix ## _enum_type_info;\
+} \
 const char * func_prefix ## _to_string( enum enum_type val ) \
 { \
 	int a; \
@@ -39,6 +78,13 @@ enum enum_type func_prefix ## _from_index( int index ) \
 { \
 	return lt_ ## enum_type ## _enum_lookup[index].value; \
 } \
+lt_enum_type_info lt_ ## func_prefix ## _enum_type_info = { \
+	#enum_type, \
+	(const char *(*)(int)) func_prefix ## _to_string, \
+	(int(*)(const char *)) func_prefix ## _from_string, \
+	func_prefix ## _get_num, \
+	(int(*)(int))func_prefix ## _from_index, \
+}; \
 lt_enum_def_t lt_ ## enum_type ## _enum_lookup[] =
 
 #define LT_E(name) { name, #name }
@@ -89,8 +135,29 @@ int main( int argc, char *argv[] )
 	for ( a = 0; a < test_get_num(); a++ )
 	{
 		int val = test_from_index( a );
-		printf( "%d -> %d -> %d\n", a, val, test_to_string( val ) );
+		printf( "%d -> %d -> %s\n", a, val, test_to_string( val ) );
 	}
+	
+	printf( "\n" );
+	
+	printf( "converting to an abstract representation:\n" );
+	
+	void *foo = (void *)test_get_struct( );
+	printf( "enum struct at %p\n", foo );
+	printf( "enum's name: %s\n", enum_get_name(foo) );
+	printf( "enum's name for 22: %s\n", enum_to_string(foo,22) );
+	printf( "enum's name for 23: %s\n", enum_to_string(foo,23) );
+	printf( "enum's value for lFoo: %d\n", enum_from_string(foo,"lFoo") );
+	printf( "enum's value for lUnknown: %d\n", enum_from_string(foo,"lUnknown") );
+	printf( "iterating through the abstract enum:\n" );
+	for ( a = 0; a < enum_get_num(foo); a++ )
+	{
+		int val = enum_from_index( foo, a );
+		printf( "%d -> %d -> %s\n", a, val, enum_to_string( foo, val ) );
+	}
+	
+	printf( "\n" );
+	
 	
 	return 0;
 }
