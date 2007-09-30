@@ -32,6 +32,7 @@ int func_prefix ## _get_num( ) \
 	int a; \
 	for ( a = 0; lt_ ## enum_type ## _enum_lookup[a].strval != NULL; a++ ) \
 		;\
+	length = a; \
 	return a; \
 } \
 enum enum_type func_prefix ## _from_index( int index ) \
