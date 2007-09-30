@@ -162,6 +162,28 @@ void LXml::_expat_end_element(void * data, const char * el)
 	}
 }
 
+void LXml::_expat_text(void * data, const char * text, int text_len)
+{
+	g_return_if_fail(data != NULL);
+	char * zero_term_text = NULL;
+	LXml * xml = static_cast<LXml *>(data);
+	//FIXME- Wtf is up with the random white space 'text' callbacks. 
+		
+	/*if(g_ascii_isspace(text[0]))
+		return;	
+	*/
+
+	if(text && text_len > 0)
+	{
+		//FIXME - This is NOT safe to do, but can be much faster.
+		zero_term_text = g_strndup(text, text_len);
+		if(xml->m_text_func)
+			xml->m_text_func(zero_term_text, NULL, NULL, xml->m_user_data);	
+		if(zero_term_text)
+			g_free(zero_term_text);
+	}
+}
+
 LXml::LXml(lt_xml_event_func * start_func, lt_xml_event_func * end_func, 
 		lt_xml_event_func * text_func, void * user_data, void (* val_free_fn) (void *))
 {
@@ -176,6 +198,7 @@ LXml::LXml(lt_xml_event_func * start_func, lt_xml_event_func * end_func,
 		XML_SetUserData(this->m_impl, (void *)this);
 		XML_SetElementHandler(this->m_impl, 
 			LXml::_expat_start_element, LXml::_expat_end_element);
+		XML_SetCharacterDataHandler(this->m_impl, LXml::_expat_text);
 	}
 }
 

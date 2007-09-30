@@ -29,11 +29,11 @@ private:
     lt_type_create_func * m_create_func;    
 };
 
-/*
-inline LType::LType(): m_klass_name(NULL),  m_super_klass(NULL), m_create_func(NULL), m_events(NULL)
+
+inline LType::LType()/*: m_klass_name(NULL),  m_super_klass(NULL), m_create_func(NULL), m_events(NULL)*/
 {
 }
-*/
+
 
 inline const char * LType::GetName()
 {

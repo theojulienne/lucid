@@ -11,6 +11,10 @@
 
 class LError;
 
+//FIXME- Figure out why most parsers pass text data with 
+//a length instead of NULL terminated. Shouldn't XML only 
+//support valid ASCII or UTF-8 ?? (e.g. NO binary)
+
 #ifndef lt_xml_event_func
 typedef void lt_xml_event_func(const char * element, const char ** attr_names,
 	const char ** attr_values, void * user_data);
@@ -50,6 +54,7 @@ private:
 private:
 	static void _expat_start_element(void *data, const char *el, const char **attr);
 	static void _expat_end_element(void * data, const char * el);
+	static void _expat_text(void * data, const char * text, int length);
 
 	XML_Parser m_impl;
 #endif

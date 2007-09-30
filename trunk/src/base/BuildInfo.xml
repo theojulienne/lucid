@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project>
-    <info>
-        <entry n="name" v="lt-base" />
-        <entry n="description" v="Lucid Toolkit - Base Module" />
-        <entry n="version" v="0.1" />
-    </info>
-    <target>    
+	<info>
+        	<entry n="name" v="lt-base" />
+        	<entry n="description" v="Lucid Toolkit - Base Module" />
+        	<entry n="version" v="0.1" />
+    	</info>
+    	<target>    
 		<sources>
-            <platform n="all">
-			    <src n="atomic.cpp" />
-			    <src n="larray.cpp" />
-			    <src n="lbase.cpp" />
-			    <src n="lhashtable.cpp" />
-			    <src n="lmodule.cpp" />
-			    <src n="lobject.cpp" />
-			    <src n="ltype.cpp" />
-            </platform>
+            		<platform n="all">
+	    			<src n="atomic.cpp" />
+				<src n="larray.cpp" />
+				<src n="lbase.cpp" />
+				<src n="lhashtable.cpp" />
+			    	<src n="lmodule.cpp" />
+			    	<src n="lobject.cpp" />
+			    	<src n="ltype.cpp" />
+            		</platform>
 			<platform n="!posix">
 				<src n="eglib/src/garray.c" />
 				<src n="eglib/src/gdate.c" />
@@ -41,51 +41,51 @@
 				<src n="eglib/src/gtimer.c" />
 				<src n="eglib/src/gunicode.c" />
 				<src n="eglib/src/gutf8.c" />
-            </platform>
+            		</platform>
 			<platform n="win32">
 				<src n="eglib/src/vasprintf.c" />
-            </platform>
-        </sources>
+            		</platform>
+        	</sources>
 		<includes>
-            <platform n="all">
-			    <src n="atomic.h" />
-			    <src n="larray.hpp" />
-			    <src n="lbase.hpp" />
-			    <src n="lhashtable.hpp" />
-			    <src n="lmodule.hpp" />
-			    <src n="lobject.hpp" />
-			    <src n="lobject.hpp" />
-			    <src n="ltype.hpp" />
-            </platform>
+           		 <platform n="all">
+			 	<src n="atomic.h" />
+			    	<src n="larray.hpp" />
+			    	<src n="lbase.hpp" />
+			    	<src n="lhashtable.hpp" />
+			    	<src n="lmodule.hpp" />
+			    	<src n="lobject.hpp" />
+			    	<src n="lobject.hpp" />
+			    	<src n="ltype.hpp" />
+            		</platform>
 			<platform n="!posix">
 				<src n="eglib/src/glib.h" />
 				<src n="eglib/src/gmodule.h" />
-	        </platform>
-        </includes>
-        <contains />
-        <options />
-        <depends />
-        <flags>
-	        <platform n="darwin">
-		        <lib n="iconv" />
-            </platform>
-	        <platform n="posix">
-		        <pkg-config n="glib-2.0 gmodule-2.0" />
-            </platform>
-	        <platform n="win32">
-		        <lib n="psapi" />
-		        <lib n="wsock32" />
-		        <ldflags v="-Wl,--export-all-symbols" />
-            </platform>	        
-            <platform n="!posix">
-		        <inc n="#src/base/eglib/src" />
-		        <inc n="#src/base/ac" />
-		        <def v="NEEDS_GLIB" />
-            </platform>
-	        <platform n="all">
-		        <def v="COMPILING_BASE" />
-            </platform>
-        </flags>
-    </target>
+	        	</platform>
+        	</includes>
+        	<contains />
+        	<options />
+        	<depends />
+        	<flags>
+	        	<platform n="darwin">
+		        	<lib n="iconv" />
+            		</platform>
+	        	<platform n="posix">
+		        	<pkg-config n="glib-2.0 gmodule-2.0" />
+            		</platform>
+	        	<platform n="win32">
+		        	<lib n="psapi" />
+		        	<lib n="wsock32" />
+		        	<ldflags v="-Wl,--export-all-symbols" />
+            		</platform>	        
+            		<platform n="!posix">
+		        	<inc n="#src/base/eglib/src" />
+		        	<inc n="#src/base/ac" />
+		        	<def n="NEEDS_GLIB" />
+            		</platform>
+	        	<platform n="all">
+		        	<def v="COMPILING_BASE" />
+            		</platform>
+        	</flags>
+    	</target>
 </project>
 
