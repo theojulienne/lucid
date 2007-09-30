@@ -17,7 +17,7 @@ enum enum_type func_prefix ## _from_string( const char *strval ) \
 	int a; \
 	for ( a = 0; lt_ ## enum_type ## _enum_lookup[a].strval != NULL; a++ ) \
 	{ \
-		if ( lt_ ## enum_type ## _enum_lookup[a].strval == strval ) \
+		if ( !strcasecmp( lt_ ## enum_type ## _enum_lookup[a].strval, strval ) ) \
 			return lt_ ## enum_type ## _enum_lookup[a].value; \
 	} \
 	return -1; \
