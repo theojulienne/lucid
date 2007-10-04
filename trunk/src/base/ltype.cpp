@@ -9,7 +9,7 @@
     } \
     G_STMT_END
 
-//LObject -> lt_object .. Does this even need to be public?
+//LObject -> lt_object .. Does this even need to be public? Probably...
 extern "C" char * _lt_type_format_name(const char * klass_name)
 {
 	GString * name = g_string_new(klass_name);

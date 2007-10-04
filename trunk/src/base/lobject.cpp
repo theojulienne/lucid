@@ -47,7 +47,8 @@ LObject::~LObject()
         g_slist_free(handler);                    
     }
 
-    delete this->m_events, handlers;
+    delete handlers;
+    delete this->m_events;
 }
 
 void LObject::SetupEvents()

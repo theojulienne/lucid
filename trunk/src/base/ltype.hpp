@@ -60,7 +60,9 @@ cpp_klass::cpp_klass () \
 } \
 static void * c_name##_ctor() \
 { \
-    return new cpp_klass(); \
+    cpp_klass * _instance = new cpp_klass(); \
+    g_assert(_instance != NULL); \
+    return _instance; \
 } \
 extern "C" cpp_klass * c_name##_create() \
 { \
