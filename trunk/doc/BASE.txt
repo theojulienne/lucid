@@ -1,0 +1,121 @@
+Here is a collection of what I want to get done.
+(From my sticky notes... :-P)
+This will become a sexy PDF in about a week or so.
+
+TODO:
+
+THREADING PRIMITIVES:
+Most of this stuff will only be used internally. But having this wrapper
+for C/C++ will help with application portability.
+
+LMutex needs a macro for static initialization.
+"LMutex mutex = LT_MUTEX_STATIC_INIT;"
+We also need a lt_mutex_trylock() function.
+
+Implement support for TLS ("thread local storage").
+A simple pointer that can be stored. With support for allocation at
+runtime, as well as the _STATIC_INIT paradigm.
+
+A "condition" object that works with LMutex.
+
+A wrapper for actual threads should be carefully written as well.
+
+A simple "message-passing" queue for use between two threads should be
+implemented. Allowing one thread to push a message on the queue, and
+another to try and pop a message off. This results in the other thread
+sleeping until it has something to do. Also- Do we need to be able to
+lock/unlock the queue?
+
+MODULE LOADING:
+LModule functionality is mostly complete.
+
+THREAD SAFETY:
+Implement the "sync-block" paradigm. Creating a new mutex for every
+single object would just be too costly. See
+http://msdn.microsoft.com/msdnmag/issues/03/01/NET/ . It might be from
+Microsoft, but its effing brilliant! (And not patented.) The behavior
+should probably go in LBase. (And make all of the LBase functionality
+thread-safe.) See the Mono implementation in mono/metadata/monitor.c.
+
+ATOMIC OPERATIONS:
+These will be needed to ref/unref an object. These need extensive
+testing and optimization for at least i386, ARM, and PPC. Having to use
+the fallback mutex implementation can hinder performance considerably.
+
+REFERENCE COUNTING:
+See the items above. Figure out if we need a much more complicated
+ref-counting system. Such as including "weak references" and "reference
+toggles". We * should * be able to avoid the circular references issue
+due to the hierarchical nature of our system.
+
+PROPERTIES:
+Again, a Microsoft-inspired idea. (AKA "DependencyProperty") Lets save
+this one for towards the end. It will need a lot of other stuff in place
+before it can be implemented properly. Also figure out how to handle
+"adhoc" properties, like GObject's g_object_set_data. Should we even
+differentiate between associated data
+(e.g. "__python_wrapper") and dependency properties (e.g. "font-size") ?
+...Beyond the obvious differences such as that the data would only be
+specific to a certain object instance. It would simply be a
+string -> pointer association in implementation.
+
+VALUE CONTAINER:
+Fairly high-priority for getting events working. Should just be a C++
+version of the claro typebox. Use the Perl/Python character conventions
+for fundamental types. Decide on how we handle more complex types such
+as "hashtable of strings and ints", if at all..?
+Anything derived from LBase should be properly ref'd/unref'd.
+
+TYPE SYSTEM:
+Ours simple type system is mostly complete. Though we need to generalize
+our types besides "object". This means a more complicated set of macros,
+and logic to handle which kind of type a type might be. Some things will
+make sense for all types, and other things wont.
+
+Needed types at the moment:
+"object": an instance of a class deriving from LObject in the heap,
+being created as a floating reference and with a parameter-less
+constructor.
+"interface": a pure-virtual class not inheriting from anything
+(double-check that?), a D-like interface. (It was added to D for this
+reason!)
+"enum": The enum type info we decide upon in enumtest.c
+"singleton": Essentially an interface with a static implementation.
+Probably the easiest way to implement this would be: (by a macro of course)
+I don't like this much...its basically using a dummy instance to pass around a vtable.
+
+FooProvider * foo_provider_get()
+{
+	static FooProvider * _instance = NULL;
+	if(! _instance)
+		_instance = (FooProvider *)LType::CreateInstance(foo_provider_register_type());	
+	return _instance;
+}
+
+LType * foo_provider_register_type();
+
+Do we need a "boxed" type paradigm? Such as passing around hashtables as
+objects instead of just an LBase-derived type.
+
+The type pointer ("LType *") should be in an internal tree. This way we
+have an actual layout of our type inheritance at runtime. Quite simple
+to add, because we need a node/tree class anyway. (I have written one in
+Python, and I can easily be port it.)
+
+A dynamically loadable type ("plugin") system will be needed in the
+future. We need to be able to handle adding and removing implementations
+of an interface. (KDE/Qt had a neat way of doing this with C++, but I
+can't remember the specifics.)
+
+SPECIFIC CLASSES:
+
+Add a "set" class. LSet<V>
+Using our hashtable class is probably the easiest. 
+We should support some array-like methods.
+
+LArray<V> (LArrayImpl):
+Add an LArray(void * impl) constructor. [For Linux functions]
+
+A LOT MORE WILL GO HERE SOON.
+
+
