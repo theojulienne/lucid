@@ -97,13 +97,13 @@ ONE SMALL NOTE- OpenSSL is NOT GPL compatible..
 
 #define _g_string_set_c_inline(s, i, v) G_STMT_START \
                 { \
-                if(i + 1 >= s->allocated_len) \
+                if(i + 1 >= (int)s->allocated_len) \
                 { \
                     /*g_print("%s: growing for %d\n", __FUNCTION__, s->allocated_len);*/ \
                     s->allocated_len = (s->allocated_len + i + 1 + 16) * 2; \
                     s->str = (char *)g_realloc((gpointer)s->str, s->allocated_len); \
                 } \
-                s->str[i] = v; \
+                s->str[i] = (char)v; \
                 } \
                 G_STMT_END 
 
@@ -130,6 +130,8 @@ char * lt_base64_encode(const unsigned char * in, int len)
 {
     GString * out;
     int idx, idx2, blks, left_over;
+	
+    //FIXME dumb C++ type safety
 
     g_return_val_if_fail(in != NULL, NULL);
     g_return_val_if_fail(len > 0, NULL);
@@ -186,7 +188,6 @@ ADD: Option to strip out newlines
 unsigned char * lt_base64_decode(const char * in, int * len)
 {
     GString * out;
-    unsigned char ch;
     int idx, idx2, blks, left_over, enc_len;
 
     g_return_val_if_fail(in != NULL, NULL);

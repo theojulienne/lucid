@@ -22,7 +22,7 @@ void LBase::Ref ()
 
 void LBase::Unref ()
 {
-	if (this->ref_count == LBASE_FLOAT_BIT || this->ref_count == 1) 
+	if ((int)this->ref_count == LBASE_FLOAT_BIT || (int)this->ref_count == 1) 
 		delete this;
     else 
         this->ref_count -= 1;

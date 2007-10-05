@@ -25,6 +25,7 @@ public:
     LArray<> * GetKeys();
     LArray<> * GetValues();
     LArray<> * GetPairs();
+    void * GetImpl();
 private:
     void * impl;    
 };
@@ -87,6 +88,10 @@ inline int LHashtableImpl::Count()
     return (int)g_hash_table_size((GHashTable *)this->impl);
 }
 
+inline void * LHashtableImpl::GetImpl()
+{
+    return this->impl;
+}
 
 template <class K = void *, class V = void *> class LHashtableEntry
 {

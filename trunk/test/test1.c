@@ -32,7 +32,7 @@ static void hash_test()
     {
         // THIS LINE WILL COST YOU HOURS. BE CAREFUL.
         char * key = (char *) * (void **)lt_array_get_item(keys, i);
-        printf("%s = %d\n", key, lt_hashtable_lookup(hash, (void *)key));
+        printf("%s = %d\n", key, GPOINTER_TO_INT(lt_hashtable_lookup(hash, (void *)key)));
     }
     
     lt_array_destroy(keys);
@@ -93,7 +93,82 @@ static void array_test()
     lt_array_destroy(array);
 }
 
-static void base64_init()
+static void _set_foreach_cb(const void * element, void * user_arg)
+{
+	printf("%s: %s\n", __FUNCTION__, (char *)element);
+	g_assert(user_arg == GINT_TO_POINTER(0xdeadbeef));
+}
+
+static void set_test()
+{
+	LSet * set = lt_set_str_create(FALSE);
+	LArray * elements;
+	int i;
+
+	lt_set_add(set, "one");
+	lt_set_add(set, "two");
+	g_assert(lt_set_contains(set, "one"));
+       	g_assert(lt_set_count(set) == 2);
+	lt_set_add(set, "one");
+       	g_assert(lt_set_count(set) == 2);
+	g_assert(lt_set_contains(set, "two"));
+
+	lt_set_foreach(set, _set_foreach_cb, GINT_TO_POINTER(0xdeadbeef));
+
+	elements = lt_set_get_elements(set);
+	g_assert(lt_array_count(elements) == 2);
+
+	for(i = 0; i < lt_array_count(elements); i++)
+		printf("%s\n", (char *) * (void **)lt_array_get_item(elements, i));	
+	
+	lt_array_destroy(elements);
+
+	lt_set_clear(set);
+	g_assert(lt_set_count(set) == 0);
+	g_assert(! lt_set_contains(set, "one"));
+	g_assert(! lt_set_contains(set, "two"));
+	
+	lt_base_unref(LT_BASE(set));
+}
+
+static void object_test()
+{
+    LObject * obj;
+    LEventID id1, id2;
+
+    //g_mem_set_vtable(glib_mem_profiler_table);
+    
+    //obj = lt_object_create();
+    //lt_type_from_name test
+    
+    obj = (LObject *)lt_type_create_instance(lt_type_from_name("LObject"));
+    
+    id1 = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee, NULL);
+
+    g_assert(id1 > 0);
+
+    id2 = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xdeadbeef, NULL);
+   
+    //  g_assert(id2 > 0);
+
+    //  g_print("%s: id1 = %d, id2 = %d\n", __FUNCTION__, id1, id2);
+
+    g_print("%s: %d\n", __FUNCTION__, (int)lt_object_find_handler(obj, _test_foo, (void *)0xc0ffee));
+
+    g_assert(lt_object_remove_handler(obj, id1));   
+  
+    g_print("%s: %d\n", __FUNCTION__, (int)lt_object_find_handler(obj, _test_foo, (void *)0xdeadbeef));
+
+    g_assert(lt_object_remove_handler(obj, id2));
+
+    lt_base_unref(LT_BASE(obj));
+
+    //    lt_base_unref(LT_BASE(obj));
+
+    //g_mem_profile ();
+}
+
+static void base64_test()
 {
     const unsigned char orig[4] = { 0, 1, 2, 3 };
     
@@ -117,48 +192,19 @@ static void base64_init()
 
 int main(int argc, char ** argv)
 {
-    LObject * obj;
-    LEventID id1, id2;
-
-    base64_init();
-
-    array_test();
-
-    //g_mem_set_vtable(glib_mem_profiler_table);
-    
     lt_type_init();
 
+    array_test();
+    
     hash_test();
 
     module_test();
 
-    //obj = lt_object_create();
-    //lt_type_from_name test
-    obj = (LObject *)lt_type_create_instance(lt_type_from_name("LObject"));
-    
-    id1 = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xc0ffee, NULL);
+    base64_test();
 
-    g_assert(id1 > 0);
+    set_test();
 
-    id2 = lt_object_add_handler(obj, "foo", _test_foo, (void *)0xdeadbeef, NULL);
-   
-  //  g_assert(id2 > 0);
-
-  //  g_print("%s: id1 = %d, id2 = %d\n", __FUNCTION__, id1, id2);
-
-    g_print("%s: %d\n", __FUNCTION__, lt_object_find_handler(obj, _test_foo, (void *)0xc0ffee));
-
-    g_assert(lt_object_remove_handler(obj, id1));   
-  
-    g_print("%s: %d\n", __FUNCTION__, lt_object_find_handler(obj, _test_foo, (void *)0xdeadbeef));
-
-    g_assert(lt_object_remove_handler(obj, id2));
-
-    lt_base_unref(LT_BASE(obj));
-
-//    lt_base_unref(LT_BASE(obj));
-
-    //g_mem_profile ();
+    object_test();
 
     return 0;
 }

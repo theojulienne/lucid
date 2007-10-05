@@ -74,6 +74,7 @@ static inline char * sstrdup(char * s)
 #include <lhashtable.hpp>
 #include <lobject.hpp>
 #include <lxml.hpp>
+#include <lset.hpp>
 
 #else
 
@@ -154,6 +155,21 @@ LXml * lt_xml_create(lt_xml_event_func * start_func, lt_xml_event_func * end_fun
 		lt_xml_event_func * text_func, void * user_data, void (* val_free_fn) (void *));
 bool_t lt_xml_parse_buffer(LXml * self, const char * data, int len, bool_t is_final, LError ** err);
 bool_t lt_xml_parse_file(LXml * self, const char * file_name, LError ** err);
+
+typedef void LSet;
+
+LSet * lt_set_create(unsigned int (* hash_fn) (const void *),
+                bool_t (* key_eq_fn) (const void *, const void *),
+                void (* key_free_fn) (void *));
+LSet * lt_set_str_create(bool_t owns_strings);
+void lt_set_add(LSet * self, void * element);
+bool_t lt_set_remove(LSet * self, void * element);
+bool_t lt_set_contains(LSet * self, void * element);
+void lt_set_clear(LSet * self);
+int lt_set_count(LSet * self);
+LArray * lt_set_get_elements(LSet * self);
+void lt_set_foreach(LSet * self, void (* set_foreach_func) (const void * value, void * user_arg), 
+                    void * user_arg);
 
 #endif
 

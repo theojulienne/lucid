@@ -33,7 +33,7 @@ LArrayImpl::~LArrayImpl()
 {
     if(this->m_val_free_fn != NULL)
     {        
-        for(int i = 0; i < this->m_impl->len; i++)
+        for(int i = 0; i < this->Count(); i++)
             this->m_val_free_fn(LT_ARRAY_INDEX(i));    
     }
     g_array_free(this->m_impl, TRUE);    
