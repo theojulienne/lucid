@@ -1,4 +1,11 @@
-For the moment..type "make" and hope for the best! :-P
-(Or modify it for your platform)
+The Lucid Toolkit uses the cross-platform CBuild build system.
+Prebuilt binaries are included in the distribution.
 
-A real build system will be added shortly..
+To compile:
+
+	Bourne-compatible shell:
+	./compile.sh
+
+	Microsoft Windows:
+	compile.bat
+

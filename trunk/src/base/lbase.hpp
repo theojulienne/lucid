@@ -6,9 +6,7 @@
 
 #include <glib.h>
 
-#ifndef bool_t
-typedef int bool_t;
-#endif
+#include <ltypes.h>
 
 class LBase
 {

@@ -6,7 +6,7 @@ info
 targets
 	library lt-base
 		sources
-			atomic.cpp
+			latomic.cpp
 			larray.cpp
 			lbase.cpp
 			lbase64.cpp
@@ -15,7 +15,8 @@ targets
 			lobject.cpp
 			ltype.cpp
 			lxml.cpp
-			lset.cpp			
+			lset.cpp
+			lthreading.cpp			
 			platform !posix
 				eglib/src/garray.c
 				eglib/src/gdate.c
@@ -78,6 +79,7 @@ flags
 		library "iconv"
 	platform posix
 		pkg-config "glib-2.0 gmodule-2.0"
+		define D_REENTRANT 
 	platform win32
 		library "psapi"
 		library "wsock32"

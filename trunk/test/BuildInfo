@@ -11,6 +11,10 @@ targets
 		sources 
 			xml_test.c
 
+	application thread_test
+		sources
+			thread_test.c
+
 flags
 	library "lt-base"
 	libdir "#src"

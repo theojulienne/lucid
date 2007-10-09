@@ -6,29 +6,13 @@
 #include <stdint.h>
 
 #include <glib.h>
-
-#include <mutex.h>
-#include <atomic.h>
-
-#ifndef bool_t
-typedef int bool_t;
-#endif
-
-#ifndef LEventID
-typedef uint64_t LEventID;
-#endif
-
-#ifndef lt_hashtable_pair
-typedef struct 
-{
-    void * key;
-    void * value;
-} lt_hashtable_pair;
-#endif
-
-// FUNCTIONS
+#include <ltypes.h>
+#include <latomic.h>
+#include <lthreading.h>
 
 G_BEGIN_DECLS
+
+// FREE FUNCTIONS FOR BOTH C & C++
 
 void lt_type_init();
 
@@ -77,6 +61,8 @@ static inline char * sstrdup(char * s)
 #include <lset.hpp>
 
 #else
+
+// * PUBLIC * C API
 
 //FIXME- implement this
 typedef void LError;
