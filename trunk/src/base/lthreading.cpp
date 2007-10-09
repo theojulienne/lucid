@@ -99,18 +99,15 @@ void	lt_thread_storage_destroy(LThreadStorage thread_storage)
 	THREAD_ASSERT(pthread_key_delete(thread_storage));
 }
 
-bool_t     lt_thread_create(LThread * thread, void * (* thread_func) (void *), void * user_data, bool_t joinable)
+bool_t    lt_thread_create(LThread * thread, void * (* thread_func) (void *), void * user_data, bool_t joinable)
 {
-	pthread_attr_t attr;
-	int ret;	
+	pthread_attr_t attr;	
 	g_return_val_if_fail(thread != NULL, FALSE);	
-	ret = pthread_attr_init(&attr);
-	THREAD_ASSERT(ret);
-	ret = pthread_attr_setdetachstate(&attr, joinable ? PTHREAD_CREATE_JOINABLE : PTHREAD_CREATE_DETACHED);
-	THREAD_ASSERT(ret);
-	ret = pthread_create(thread, &attr, thread_func, user_data);
+	THREAD_ASSERT(pthread_attr_init(&attr));
+	THREAD_ASSERT(pthread_attr_setdetachstate(&attr, joinable ? PTHREAD_CREATE_JOINABLE : PTHREAD_CREATE_DETACHED));
+	THREAD_ASSERT(pthread_create(thread, &attr, thread_func, user_data));
 	THREAD_ASSERT(pthread_attr_destroy(&attr));
-	return ret == 0;
+	return TRUE;
 }
 
 void	   lt_thread_exit(void * ret_val)
