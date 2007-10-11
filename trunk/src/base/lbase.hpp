@@ -7,8 +7,9 @@
 #include <glib.h>
 
 #include <ltypes.h>
+#include <lallocator.hpp>
 
-class LBase
+class LBase: public LAllocator
 {
 public:
     LBase();

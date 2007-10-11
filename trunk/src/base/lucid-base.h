@@ -52,6 +52,7 @@ static inline char * sstrdup(char * s)
 #endif
 
 #include <ltype.hpp>
+#include <lallocator.hpp>
 #include <larray.hpp>
 #include <lbase.hpp>
 #include <lmodule.hpp>

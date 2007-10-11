@@ -3,7 +3,7 @@
 
 #include <lhashtable.hpp>
 
-template <class V = void *> class LSet: LBase
+template <class V = void *> class LSet: public LBase
 {
 public:
 	LSet(unsigned int (* hash_fn) (const void *),

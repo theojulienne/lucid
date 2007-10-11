@@ -21,7 +21,7 @@ typedef void lt_xml_event_func(const char * element, const char ** attr_names,
 #endif
 
 //We'll see how LBase pans out...Not sure if it will make sense to subclass LBase. (Needed for threading)
-class LXml: LBase
+class LXml: public LBase
 {
 public:
 	LXml(lt_xml_event_func * start_func, lt_xml_event_func * end_func, 
