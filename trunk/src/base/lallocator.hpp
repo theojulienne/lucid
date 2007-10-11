@@ -3,6 +3,8 @@
 
 #include <glib.h>
 
+//This way we have a consistent memory allocation scheme.
+
 class LAllocator
 {
 public:
@@ -21,5 +23,5 @@ public:
 		g_free(addr);
       	}
 };
-
+ 
 #endif
