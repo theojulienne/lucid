@@ -51,42 +51,41 @@ bool_t lt_atomic_compare_xfer_int(volatile int	* ptr, int old_val, int new_val)
 */
 #else
 
-static LMutex _atomic_mutex = LT_MUTEX_STATIC_INIT;
-
+static LMutex _atomic_mutex;
 
 int lt_atomic_get_int(volatile int * ptr)
 {
 	int res;
 	
-	lt_mutex_lock (&_atomic_mutex);
+	_atomic_mutex.Lock();
 	res = *ptr;
-	lt_mutex_unlock (&_atomic_mutex);
+	_atomic_mutex.Unlock();
 
 	return res;
 }
 
 void lt_atomic_set_int(volatile int * ptr, int new_val)
 {
-	lt_mutex_lock (&_atomic_mutex);
+	_atomic_mutex.Lock();
 	*ptr = new_val;
-	lt_mutex_unlock (&_atomic_mutex);
+	_atomic_mutex.Unlock();
 }
 
 void lt_atomic_add_int(volatile int * ptr, int val)
 {
-	lt_mutex_lock (&_atomic_mutex);
+	_atomic_mutex.Lock();
    	*ptr += val;
-    	lt_mutex_unlock (&_atomic_mutex);
+    	_atomic_mutex.Unlock();
 }
 
 int lt_atomic_add_xfer_int(volatile int * ptr, int val)
 {
     	int res;
     
-    	lt_mutex_lock (&_atomic_mutex);
+    	_atomic_mutex.Lock();
     	res = *ptr;
     	*ptr += val;
-    	lt_mutex_unlock (&_atomic_mutex);
+    	_atomic_mutex.Unlock();
 
     	return res;
 }
@@ -95,7 +94,7 @@ int lt_atomic_compare_xfer_int(volatile int * ptr, int old_val, int new_val)
 {
     	int res;
 
-    	lt_mutex_lock (&_atomic_mutex);
+    	_atomic_mutex.Lock();
 
     	if (*ptr == old_val)
     	{
@@ -105,8 +104,9 @@ int lt_atomic_compare_xfer_int(volatile int * ptr, int old_val, int new_val)
     	else
         	res = FALSE;
     
-    	lt_mutex_unlock (&_atomic_mutex);
-    	return res;
+    	_atomic_mutex.Unlock();
+    	
+	return res;
 }
 
 #endif

@@ -2,6 +2,7 @@
 
 extern "C"
 {
+
 LArrayImpl * lt_array_create(void (* val_free_fn) (void *), int elem_size);
 void lt_array_destroy(LArrayImpl * self);
 void lt_array_append(LArrayImpl * self, void * value);
@@ -19,33 +20,36 @@ void lt_array_set_item(LArrayImpl * self, int index, void * value);
 void lt_array_clear(LArrayImpl * self);
 int lt_array_count(LArrayImpl * self);
 char * lt_array_get_data(LArrayImpl * self);
+
 }
 
 LArrayImpl::LArrayImpl(void (* val_free_fn) (void *), int elem_size): m_elem_size(elem_size)
 {
-    g_assert(elem_size > 0);
-    this->m_impl = g_array_new(FALSE, TRUE, elem_size);
-    g_assert(this->m_impl != NULL);
-    this->m_val_free_fn = val_free_fn;
+	g_assert(elem_size > 0);
+	
+	this->m_impl = g_array_new(FALSE, TRUE, elem_size);
+	g_assert(this->m_impl != NULL);
+
+	this->m_val_free_fn = val_free_fn;
 }
 
 LArrayImpl::~LArrayImpl()
 {
-    if(this->m_val_free_fn != NULL)
-    {        
-        for(int i = 0; i < this->Count(); i++)
-            this->m_val_free_fn(LT_ARRAY_INDEX(i));    
-    }
-    g_array_free(this->m_impl, TRUE);    
+	if(this->m_val_free_fn != NULL)
+    	{        
+        	for(int i = 0; i < this->Count(); i++)
+            		this->m_val_free_fn(LT_ARRAY_INDEX(i));    
+    	}
+    	g_array_free(this->m_impl, TRUE);    
 }
 
 void LArrayImpl::Foreach(void (* list_foreach_func) (const void * value, void * user_arg), 
                     void * user_arg)
 {
-    g_return_if_fail(list_foreach_func != NULL);
+    	g_return_if_fail(list_foreach_func != NULL);
     
-    for(int i = 0, len = this->m_impl->len; i < len; i++)
-        list_foreach_func((const void *)LT_ARRAY_INDEX(i), user_arg);
+    	for(int i = 0, len = this->m_impl->len; i < len; i++)
+        	list_foreach_func((const void *)LT_ARRAY_INDEX(i), user_arg);
 }
 
 void LArrayImpl::Insert(int index, void * value)
@@ -70,113 +74,100 @@ void LArrayImpl::Insert(int index, void * value)
         array->pdata[i + 1] = array->pdata[i];
     array->pdata[index] = value;
 */
-    g_array_insert_vals(this->m_impl, index, value, 1);
+	g_array_insert_vals(this->m_impl, index, value, 1);
 }
 
 void LArrayImpl::Reverse()
 {
-//FIXME- use some memcpy bullshit
-    void * tmp;
-    int i, j;
+	//FIXME- Test this a bit more thoroughly
+    	void * tmp;
+    	int i, j;
 
-    tmp = g_malloc(this->m_elem_size);
-    g_assert(tmp != NULL);
+    	tmp = g_malloc(this->m_elem_size);
+    	g_assert(tmp != NULL);
 
-    j = this->m_impl->len - 1;
+    	j = this->m_impl->len - 1;
 
-    for(i = 0; i < j; i++, j--)
-    {
-        memmove(tmp, LT_ARRAY_INDEX(i), this->m_elem_size); 
-        memmove(LT_ARRAY_INDEX(i), LT_ARRAY_INDEX(j), this->m_elem_size);  
-        memmove(LT_ARRAY_INDEX(j), tmp, this->m_elem_size);                
-    }    
+    	for(i = 0; i < j; i++, j--)
+    	{
+        	memmove(tmp, LT_ARRAY_INDEX(i), this->m_elem_size); 
+       		memmove(LT_ARRAY_INDEX(i), LT_ARRAY_INDEX(j), this->m_elem_size);  
+        	memmove(LT_ARRAY_INDEX(j), tmp, this->m_elem_size);                
+    	}    
 
-    g_free(tmp);
+    	g_free(tmp);
 }
 
 LArrayImpl * lt_array_create(void (* val_free_fn) (void *), int elem_size)
 {
-    return new LArrayImpl(val_free_fn, elem_size);
+	LT_NEW_CPP(LArrayImpl, val_free_fn, elem_size);
 }
 
 void lt_array_destroy(LArrayImpl * self)
 {
-    g_return_if_fail(self != NULL);
-    delete self;
+	LT_DELETE_CPP();
 }
 
 void lt_array_append(LArrayImpl * self, void * value)
 {
-    g_return_if_fail(self != NULL);
-    self->Append(value);
+	LT_CALL_CPP(Append, value);
 }
 
 void lt_array_insert(LArrayImpl * self, int index, void * value)
 {
-    g_return_if_fail(self != NULL);
-    self->Insert(index, value);
+	LT_CALL_CPP(Insert, index, value);
 }
 
 bool_t lt_array_remove(LArrayImpl * self, void * value)
 {
-    g_return_val_if_fail(self != NULL, FALSE);
-    return self->Remove(value);
+	LT_RET_CALL_CPP(Remove, FALSE, value);
 }
 
 bool_t lt_array_remove_index(LArrayImpl * self, int index)
 {
-    g_return_val_if_fail(self != NULL, FALSE);
-    return self->RemoveIndex(index);
+	LT_RET_CALL_CPP(RemoveIndex, FALSE, index);
 }
 
 void lt_array_reverse(LArrayImpl * self)
 {
-    g_return_if_fail(self != NULL);
-    return self->Reverse();
+	LT_CALL_CPP(Reverse);
 }
 
 void lt_array_sort(LArrayImpl * self, int (* list_compare_func) (const void * value1, 
                                             const void * value2))
 {
-    g_return_if_fail(self != NULL);
-    self->Sort(list_compare_func);
+	LT_CALL_CPP(Sort, list_compare_func);
 }
 
 void lt_array_foreach(LArrayImpl * self, void (* list_foreach_func) (const void * value, 
                                             void * user_arg), 
                                             void * user_arg)
 {
-    g_return_if_fail(self != NULL);
-    self->Foreach(list_foreach_func, user_arg);
+	LT_CALL_CPP(Foreach, list_foreach_func, user_arg);
 }
 
 void * lt_array_get_item(LArrayImpl * self, int index)
 {
-    g_return_val_if_fail(self != NULL, NULL);
-    return self->GetItem(index);
+	LT_RET_CALL_CPP(GetItem, NULL, index);
 }
 
 void lt_array_set_item(LArrayImpl * self, int index, void * value)
 {
-    g_return_if_fail(self != NULL);
-    self->SetItem(index, value);
+	LT_CALL_CPP(SetItem, index, value);
 }
 
 void lt_array_clear(LArrayImpl * self)
 {
-    g_return_if_fail(self != NULL);
-    self->Clear();
+	LT_CALL_CPP(Clear);
 }
 
 int lt_array_count(LArrayImpl * self)
 {
-    g_return_val_if_fail(self != NULL, -1);
-    return self->Count();
+	LT_RET_CALL_CPP(Count, -1);
 }
  
 char * lt_array_get_data(LArrayImpl * self)
 {
-   g_return_val_if_fail(self != NULL, NULL);
-   return self->GetData();	
+	LT_RET_CALL_CPP(GetData, NULL);
 }
    

@@ -29,7 +29,16 @@ static inline char * sstrdup(char * s)
     return g_strdup(s);
 }
 
-#define LT_CALL_SELF_CPP( cpp_func, params... ) \
+#define	LT_NEW_CPP(cpp_klass, params...)	return new cpp_klass(params)
+
+#define LT_DELETE_CPP()	G_STMT_START \
+	{ \
+		g_return_if_fail(self != NULL); \
+		delete self; \
+	} \
+	G_STMT_END
+
+#define LT_CALL_CPP( cpp_func, params... ) \
      G_STMT_START \
      { \
          g_return_if_fail( self != NULL ); \
@@ -37,7 +46,7 @@ static inline char * sstrdup(char * s)
      } \
      G_STMT_END
  
-#define LT_RETURN_CALL_SELF_CPP( cpp_func, fail_value, params... ) \
+#define LT_RET_CALL_CPP( cpp_func, fail_value, params... ) \
      G_STMT_START \
      { \
          g_return_val_if_fail( self != NULL, fail_value ); \
@@ -125,7 +134,7 @@ typedef void LEvent;
 
 typedef void LObject;
 
-typedef void lt_object_event_func(LObject * sender, LHashtable * args, void * user_data);
+typedef void lt_object_event_func(LObject * sender, LEvent * args, void * user_data);
 
 LObject * lt_object_create();
 LEventID lt_object_add_handler(LObject * self, char * event_name, 

@@ -11,14 +11,12 @@
 
 class LError;
 
+typedef void lt_xml_event_func(const char * element, const char ** attr_names,
+	const char ** attr_values, void * user_data);
+
 //FIXME- Figure out why most parsers pass text data with 
 //a length instead of NULL terminated. Shouldn't XML only 
 //support valid ASCII or UTF-8 ?? (e.g. NO binary)
-
-#ifndef lt_xml_event_func
-typedef void lt_xml_event_func(const char * element, const char ** attr_names,
-	const char ** attr_values, void * user_data);
-#endif
 
 //We'll see how LBase pans out...Not sure if it will make sense to subclass LBase. (Needed for threading)
 class LXml: public LBase

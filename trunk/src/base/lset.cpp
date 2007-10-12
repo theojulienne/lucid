@@ -40,51 +40,47 @@ LSet<> * lt_set_create(unsigned int (* hash_fn) (const void *),
                 bool_t (* key_eq_fn) (const void *, const void *),
                 void (* key_free_fn) (void *))
 {
-	LSet<> * set = new LSet<>(hash_fn, key_eq_fn, key_free_fn);
-	g_assert(set != NULL);
-	return set;
+	LT_NEW_CPP(LSet<>, hash_fn, key_eq_fn, key_free_fn);
 }
 
 LSet<> * lt_set_str_create(bool_t owns_strings)
 {
-	LSet<> * set = new LSet<>(owns_strings);
-	g_assert(set != NULL);
-	return set;
+	LT_NEW_CPP(LSet<>, owns_strings);
 }
 
 void lt_set_add(LSet<> * self, void * element)
 {
-	LT_CALL_SELF_CPP(Add, element);
+	LT_CALL_CPP(Add, element);
 }
 
 bool_t lt_set_remove(LSet<> * self, void * element)
 {
-	LT_RETURN_CALL_SELF_CPP(Remove, FALSE, element);
+	LT_RET_CALL_CPP(Remove, FALSE, element);
 }
 
 bool_t lt_set_contains(LSet<> * self, void * element)
 {
-	LT_RETURN_CALL_SELF_CPP(Contains, FALSE, element);	
+	LT_RET_CALL_CPP(Contains, FALSE, element);	
 }
 
 void lt_set_clear(LSet<> * self)
 {
-	LT_CALL_SELF_CPP(Clear);
+	LT_CALL_CPP(Clear);
 }
 
 int lt_set_count(LSet<> * self)
 {
-	LT_RETURN_CALL_SELF_CPP(Count, -1);	
+	LT_RET_CALL_CPP(Count, -1);	
 }
 
 LArray<> * lt_set_get_elements(LSet<> * self)
 {
-	LT_RETURN_CALL_SELF_CPP(GetElements, NULL);	
+	LT_RET_CALL_CPP(GetElements, NULL);	
 }
 
 void lt_set_foreach(LSet<> * self, void (* set_foreach_func) (const void * value, void * user_arg), 
                     void * user_arg)
 {
-	LT_CALL_SELF_CPP(Foreach, set_foreach_func, user_arg);
+	LT_CALL_CPP(Foreach, set_foreach_func, user_arg);
 }
 

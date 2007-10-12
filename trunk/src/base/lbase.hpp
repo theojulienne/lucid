@@ -12,10 +12,11 @@
 class LBase: public LAllocator
 {
 public:
-    LBase();
-    virtual ~LBase()  { }
-    void Ref();
-    void Unref();
+    	LBase();
+    	virtual ~LBase()  { }
+    	void Ref();
+    	void Unref();
+
 private:
     volatile uint32_t ref_count;        
 };

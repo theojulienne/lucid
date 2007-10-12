@@ -68,30 +68,30 @@ bool_t	LMutex::Trylock()
 
 LMutex * lt_mutex_create()
 {
-	//FIXME - What is our stance on the new operator? We should probably come up with our own 'lt_new' that checks. 
-	// See lallocator.hpp
-	return new LMutex();
+	//FIXME - What is our stance on the new operator? 
+	// We should probably come up with our own 'lt_new' that checks. 
+	// [See lallocator.hpp]
+	LT_NEW_CPP(LMutex);
 }
 
 void	lt_mutex_lock(LMutex * self)
 {
-	LT_CALL_SELF_CPP(Lock);
+	LT_CALL_CPP(Lock);
 }
 
 bool_t	lt_mutex_trylock(LMutex * self)
 {
-	LT_RETURN_CALL_SELF_CPP(Trylock, FALSE);
+	LT_RET_CALL_CPP(Trylock, FALSE);
 }
 
 void	lt_mutex_unlock(LMutex * self)
 {
-	LT_CALL_SELF_CPP(Unlock);
+	LT_CALL_CPP(Unlock);
 }
 
 void	lt_mutex_destroy(LMutex * self)
 {
-	g_return_if_fail(self != NULL);
-	delete self;
+	LT_DELETE_CPP();
 }	
 
 LCond::LCond()
@@ -121,28 +121,27 @@ void	LCond::Wait(LMutex * mutex)
 
 LCond * lt_cond_create()
 {
-	return new LCond();
+	LT_NEW_CPP(LCond);
 }
 
 void	lt_cond_signal(LCond * self)
 {
-	LT_CALL_SELF_CPP(Signal);
+	LT_CALL_CPP(Signal);
 }
 
 void	lt_cond_broadcast(LCond * self)
 {
-	LT_CALL_SELF_CPP(Broadcast);
+	LT_CALL_CPP(Broadcast);
 }
 
 void	lt_cond_wait(LCond * self, LMutex * mutex)
 {
-	LT_CALL_SELF_CPP(Wait, mutex);
+	LT_CALL_CPP(Wait, mutex);
 }
 
 void	lt_cond_destroy(LCond * self)
 {
-	g_return_if_fail(self != NULL);
-	delete self;
+	LT_DELETE_CPP();
 }
 
 LThreadStorage::LThreadStorage(void (* val_free_fn) (void *))
@@ -167,23 +166,22 @@ void * LThreadStorage::Get()
 
 LThreadStorage *  lt_thread_storage_create(void (* val_free_fn) (void *))
 {
-	return new LThreadStorage(val_free_fn); 
+	LT_NEW_CPP(LThreadStorage, val_free_fn); 
 }
 
 void 	lt_thread_storage_set(LThreadStorage * self, void * key)
 {
-	LT_CALL_SELF_CPP(Set, key); 
+	LT_CALL_CPP(Set, key); 
 }
 
 void *	lt_thread_storage_get(LThreadStorage * self)
 {
-	LT_RETURN_CALL_SELF_CPP(Get, NULL);
+	LT_RET_CALL_CPP(Get, NULL);
 }
 
 void	lt_thread_storage_destroy(LThreadStorage * self)
 {
-	g_return_if_fail(self != NULL);
-	delete self;
+	LT_DELETE_CPP();
 }
 
 bool_t    lt_thread_create(LThread * thread, void * (* thread_func) (void *), void * user_data, bool_t joinable)

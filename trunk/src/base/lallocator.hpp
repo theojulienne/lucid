@@ -4,6 +4,8 @@
 #include <glib.h>
 
 //This way we have a consistent memory allocation scheme.
+//We also need to incorporate our "synch block" pointer into the class tree somewhere. Here would 
+//make sense so far, but we will need to come up with a better name. (LCoreMixin?)
 
 class LAllocator
 {

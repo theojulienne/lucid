@@ -6,10 +6,12 @@
 
 extern "C" 
 {
+
 LXml * lt_xml_create(lt_xml_event_func * start_func, lt_xml_event_func * end_func, 
 		lt_xml_event_func * text_func, void * user_data, void (* val_free_fn) (void *));
 bool_t lt_xml_parse_buffer(LXml * self, const char * data, int len, bool_t is_final, LError ** err);
 bool_t lt_xml_parse_file(LXml * self, const char * file_name, LError ** err);
+
 }
 
 #if 0 //LT_XML_PARSER_GMARKUP
@@ -251,16 +253,16 @@ bool_t LXml::ParseFile(const char * file_name, LError ** err)
 LXml * lt_xml_create(lt_xml_event_func * start_func, lt_xml_event_func * end_func, 
 		lt_xml_event_func * text_func, void * user_data, void (* val_free_fn) (void *))
 {
-	return new LXml(start_func, end_func, text_func, user_data, val_free_fn);
+	LT_NEW_CPP(LXml, start_func, end_func, text_func, user_data, val_free_fn);
 }
 
 bool_t lt_xml_parse_buffer(LXml * self, const char * data, int len, bool_t is_final, LError ** err)
 {
-	LT_RETURN_CALL_SELF_CPP(ParseBuffer, FALSE, data, len, is_final, err);
+	LT_RET_CALL_CPP(ParseBuffer, FALSE, data, len, is_final, err);
 }
 
 bool_t lt_xml_parse_file(LXml * self, const char * file_name, LError ** err)
 {
-	LT_RETURN_CALL_SELF_CPP(ParseFile, FALSE, file_name, err);
+	LT_RET_CALL_CPP(ParseFile, FALSE, file_name, err);
 }
 
