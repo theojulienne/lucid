@@ -14,7 +14,7 @@ bool_t lt_xml_parse_file(LXml * self, const char * file_name, LError ** err);
 
 }
 
-#if 0 //LT_XML_PARSER_GMARKUP
+#if 1 //LT_XML_PARSER_GMARKUP
 
 void LXml::_gmarkup_parse_start_element(GMarkupParseContext *context,
                           const gchar         *element_name,
@@ -65,7 +65,7 @@ void LXml::_gmarkup_parse_text(GMarkupParseContext *context,
 	}
 }
    
-static GMarkupParser _gmarkup_parser = 
+GMarkupParser LXml::_gmarkup_parser = 
 {
 	LXml::_gmarkup_parse_start_element, 
 	LXml::_gmarkup_parse_end_element, 
@@ -129,7 +129,7 @@ bool_t LXml::ParseBuffer(const char * data, int len, bool_t is_final, LError ** 
 	return TRUE;
 }
 
-#elif 1 //LT_XML_PARSER_EXPAT
+#elif 0 //LT_XML_PARSER_EXPAT
 
 void LXml::_expat_start_element(void *data, const char *el, const char **attr)
 {

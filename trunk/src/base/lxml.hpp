@@ -3,9 +3,9 @@
 
 #include <lbase.hpp>
 
-#if 0 //LT_XML_PARSER_GMARKUP
+#if 1 //LT_XML_PARSER_GMARKUP
 #include <glib.h>
-#elif 1 //LT_XML_PARSER_EXPAT
+#elif 0 //LT_XML_PARSER_EXPAT
 #include <expat.h>
 #endif
 
@@ -29,7 +29,7 @@ public:
 	bool_t ParseBuffer(const char * data, int len, bool_t is_final, LError ** err);
 	bool_t ParseFile(const char * file_name, LError ** err);
 
-#if 0 //LT_XML_PARSER_GMARKUP
+#if 1 //LT_XML_PARSER_GMARKUP
 private:
 	static void _gmarkup_parse_start_element(GMarkupParseContext *context,
                           const gchar         *element_name,
@@ -47,8 +47,10 @@ private:
                           gpointer             user_data,
                           GError             **error);
 
+	static GMarkupParser _gmarkup_parser;
+
 	GMarkupParseContext * m_impl;
-#elif 1 //LT_XML_PARSER_EXPAT
+#elif 0 //LT_XML_PARSER_EXPAT
 private:
 	static void _expat_start_element(void *data, const char *el, const char **attr);
 	static void _expat_end_element(void * data, const char * el);
