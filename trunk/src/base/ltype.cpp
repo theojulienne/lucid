@@ -49,9 +49,17 @@ void lt_type_init()
     	_lt_type_table = new LHashtable<const char *, LType *>(FALSE, NULL);
     	_lt_this_module = LModule::Load(NULL);
     	g_assert(_lt_type_table != NULL && _lt_this_module != NULL);
-//TEST
-//    	printf("%s: %s\n", __FUNCTION__, _lt_type_format_name("LObject"));
-//    	printf("%s: %s\n", __FUNCTION__, _lt_type_format_name("LColorDialog"));
+//RANDOM TESTS
+/*    	
+	printf("%s: %s\n", __FUNCTION__, _lt_type_format_name("LObject"));
+    	printf("%s: %s\n", __FUNCTION__, _lt_type_format_name("LColorDialog"));
+	LArray<int> * a = new LArray<int>(NULL);
+	a->Append(1);
+	a->Append(2);
+	a->Append(3);
+	for(int i = 0; i < 3; i++)	
+		g_print("%s: %d\n", __FUNCTION__, a->Pop(0));
+*/
 }
 
 LType * LType::Register(const char * klass_name, 

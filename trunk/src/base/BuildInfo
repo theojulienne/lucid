@@ -79,7 +79,7 @@ flags
 		library "iconv"
 	platform posix
 		pkg-config "glib-2.0 gmodule-2.0"
-		define D_REENTRANT 
+		define REENTRANT 
 	platform win32
 		library "psapi"
 		library "wsock32"

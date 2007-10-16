@@ -98,6 +98,27 @@ void LArrayImpl::Reverse()
     	g_free(tmp);
 }
 
+void * LArrayImpl::Pop(int index)
+{
+	void * value;
+
+	if (this->Count() == 0)
+		return NULL;
+
+	if (index < 0)
+		index = this->Count() - 1;
+
+	if (index >= this->Count())
+		return NULL;
+
+	value = this->GetItem(index);
+
+	if(! this->RemoveIndex(index))
+		return NULL;
+
+	return value;
+}
+
 LArrayImpl * lt_array_create(void (* val_free_fn) (void *), int elem_size)
 {
 	LT_NEW_CPP(LArrayImpl, val_free_fn, elem_size);

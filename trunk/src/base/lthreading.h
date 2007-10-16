@@ -3,6 +3,12 @@
 
 #include <ltypes.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <pthread.h>
+#endif
+
 //FIXME - Add the use of the LError API in the threading system ?
 
 #ifdef __cplusplus
@@ -22,7 +28,11 @@ public:
 	bool_t Trylock();
 	void Unlock();	
 private:
-	void * m_impl;
+#ifdef _WIN32
+	CRITICAL_SECTION m_impl;
+#else
+	pthread_mutex_t m_impl;
+#endif
 };
 
 class LCond
@@ -34,7 +44,13 @@ public:
 	void Broadcast();
 	void Wait(LMutex * mutex);
 private:
-	void * m_impl;
+#ifdef _WIN32
+	HANDLE m_impl;
+	//Simulate a condition variable
+	volatile LONG m_waiting;
+#else
+	pthread_cond_t m_impl;
+#endif
 };
 
 class LThreadStorage
@@ -45,7 +61,12 @@ public:
 	void Set(void * key);
 	void * Get();
 private:
-	void * m_impl;
+#ifdef _WIN32
+	DWORD m_impl;
+	void (* m_val_free_fn) (void *);
+#else
+	pthread_key_t m_impl;
+#endif
 };
 
 #else

@@ -1,9 +1,5 @@
 #include <lucid-base.h>
 
-#include <pthread.h>
-
-#define THREAD_ASSERT(x)	G_STMT_START { if(x == 0) ; else g_error("%s: %s\n", __FUNCTION__, strerror(x)); }
-
 extern "C"
 {
 
@@ -41,147 +37,204 @@ void	 _lt_once_run(LOnce * once, void * (* init_func) (void *), void * user_data
 LMutex _lt_once_mutex;
 LCond _lt_once_cond;
 
-LMutex::LMutex(): m_impl(NULL)
+#ifdef _WIN32
+
+//FIXME- A THREAD_ASSERT macro needs to be implemented for Windows. 
+//	 But should probably be in lucid-base.h- for use in other files.
+
+LMutex::LMutex()
 {
-	THREAD_ASSERT(pthread_mutex_init((pthread_mutex_t *)&this->m_impl, NULL));
+	InitializeCriticalSection(&this->m_impl, NULL);
 }
 
 LMutex::~LMutex()
 {
-	THREAD_ASSERT(pthread_mutex_destroy((pthread_mutex_t *)&this->m_impl));
+	DeleteCriticalSection(&this->m_impl);
 }
 
 void	LMutex::Lock()
 {
-	THREAD_ASSERT(pthread_mutex_lock((pthread_mutex_t *)&this->m_impl));
+	EnterCriticalSection(&this->m_impl);
 }
 
 void 	LMutex::Unlock()
 {
-	THREAD_ASSERT(pthread_mutex_unlock((pthread_mutex_t *)&this->m_impl));
+	EnterCriticalSection(&this->m_impl);
 }
 
 bool_t	LMutex::Trylock()
 {
-	return pthread_mutex_trylock((pthread_mutex_t *)&this->m_impl) == 0;
+	//FIXME
+	EnterCriticalSection(&this->m_impl);
+	return TRUE;
 }
-
-LMutex * lt_mutex_create()
-{
-	//FIXME - What is our stance on the new operator? 
-	// We should probably come up with our own 'lt_new' that checks. 
-	// [See lallocator.hpp]
-	LT_NEW_CPP(LMutex);
-}
-
-void	lt_mutex_lock(LMutex * self)
-{
-	LT_CALL_CPP(Lock);
-}
-
-bool_t	lt_mutex_trylock(LMutex * self)
-{
-	LT_RET_CALL_CPP(Trylock, FALSE);
-}
-
-void	lt_mutex_unlock(LMutex * self)
-{
-	LT_CALL_CPP(Unlock);
-}
-
-void	lt_mutex_destroy(LMutex * self)
-{
-	LT_DELETE_CPP();
-}	
 
 LCond::LCond()
 {
-	THREAD_ASSERT(pthread_cond_init((pthread_cond_t *)&this->m_impl, NULL));
+	this->m_impl = CreateSemaphore(NULL, 0, LONG_MAX, NULL);
+	this->m_waiting = 0;
 }
 
 LCond::~LCond()
 {
-	THREAD_ASSERT(pthread_cond_destroy((pthread_cond_t *)&this->m_impl));
+	CloseHandle(this->m_impl);
 }
 
 void	LCond::Signal()
 {
-	THREAD_ASSERT(pthread_cond_signal((pthread_cond_t *)&this->m_impl));
+	//FIXME- ATOMIC CHECK ?
+	if (this->m_waiting > 0)
+        	ReleaseSemaphore(this->m_impl, 1, NULL);
 }
 
 void 	LCond::Broadcast()
 {
-	THREAD_ASSERT(pthread_cond_broadcast((pthread_cond_t *)&this->m_impl));
+	//FIXME- ATOMIC CHECK ?
+	if (m_waiting > 0)
+        	ReleaseSemaphore(this->m_impl, this->m_waiting, NULL);
 }
 
 void	LCond::Wait(LMutex * mutex)
 {
-	THREAD_ASSERT(pthread_cond_wait((pthread_cond_t *)&this->m_impl, (pthread_mutex_t *)&mutex->m_impl));
-}
-
-LCond * lt_cond_create()
-{
-	LT_NEW_CPP(LCond);
-}
-
-void	lt_cond_signal(LCond * self)
-{
-	LT_CALL_CPP(Signal);
-}
-
-void	lt_cond_broadcast(LCond * self)
-{
-	LT_CALL_CPP(Broadcast);
-}
-
-void	lt_cond_wait(LCond * self, LMutex * mutex)
-{
-	LT_CALL_CPP(Wait, mutex);
-}
-
-void	lt_cond_destroy(LCond * self)
-{
-	LT_DELETE_CPP();
+	g_return_if_fail(mutex != NULL);
+	lt_atomic_add_int(&this->m_waiting, 1);
+       	mutex->Lock();
+       	WaitForSingleObject(this->m_impl, INFINITE);
+       	mutex->Unlock();
+	lt_atomic_add_int(&this->m_waiting, -1);
 }
 
 LThreadStorage::LThreadStorage(void (* val_free_fn) (void *))
 {
-	THREAD_ASSERT(pthread_key_create((pthread_key_t *)&this->m_impl, val_free_fn));
+	this->m_impl = TlsAlloc();
+	g_assert(this->m_impl != TLS_OUT_OF_INDEXES);
+	this->m_val_free_fn = val_free_fn;
 }
 
 LThreadStorage::~LThreadStorage()
 {
-	THREAD_ASSERT(pthread_key_delete((pthread_key_t)this->m_impl));
+	if(this->m_val_free_fn)
+		this->m_val_free_fn(this->Get());
+	g_assert(TlsFree(this->m_impl));
 }
 
 void LThreadStorage::Set(void * key)
 {
-	THREAD_ASSERT(pthread_setspecific((pthread_key_t)this->m_impl, key));
+	g_assert(TlsSetValue(this->m_impl, key));
 }
 
 void * LThreadStorage::Get()
 {
-	return pthread_getspecific((pthread_key_t)this->m_impl);
+	return TlsGetValue(this->m_impl);
 }
 
-LThreadStorage *  lt_thread_storage_create(void (* val_free_fn) (void *))
+bool_t    lt_thread_create(LThread * thread, void * (* thread_func) (void *), void * user_data, bool_t joinable)
 {
-	LT_NEW_CPP(LThreadStorage, val_free_fn); 
+	DWORD thread_id;
+        HANDLE h;
+
+	g_return_val_if_fail(thread != NULL, FALSE);	
+	
+	h = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)thread_func, 
+		(PVOID)user_data, 0, &thread_id);
+	if(! joinable)
+		CloseHandle(h);
+	* thread = (LThread)h;
+	return h != NULL;	
 }
 
-void 	lt_thread_storage_set(LThreadStorage * self, void * key)
+void	   lt_thread_exit(void * ret_val)
 {
-	LT_CALL_CPP(Set, key); 
+	ExitThread((DWORD)ret_val);
 }
 
-void *	lt_thread_storage_get(LThreadStorage * self)
+void *	   lt_thread_join(LThread thread)
 {
-	LT_RET_CALL_CPP(Get, NULL);
+	HANDLE h = (HANDLE)thread;
+	DWORD ret_val = 0;
+	WaitForSingleObject(h, INFINITE);
+	GetExitCodeThread(h, &ret_val); 
+       	CloseHandle(h);
+	return ret_val;
 }
 
-void	lt_thread_storage_destroy(LThreadStorage * self)
+LThread    lt_thread_self()
 {
-	LT_DELETE_CPP();
+	return (LThread)GetCurrentThread();
+}
+
+#else
+
+#define THREAD_ASSERT(x)	G_STMT_START { if(x == 0) ; else g_error("%s: %s\n", __FUNCTION__, strerror(x)); }
+
+LMutex::LMutex()
+{
+	THREAD_ASSERT(pthread_mutex_init(&this->m_impl, NULL));
+}
+
+LMutex::~LMutex()
+{
+	THREAD_ASSERT(pthread_mutex_destroy(&this->m_impl));
+}
+
+void	LMutex::Lock()
+{
+	THREAD_ASSERT(pthread_mutex_lock(&this->m_impl));
+}
+
+void 	LMutex::Unlock()
+{
+	THREAD_ASSERT(pthread_mutex_unlock(&this->m_impl));
+}
+
+bool_t	LMutex::Trylock()
+{
+	return pthread_mutex_trylock(&this->m_impl) == 0;
+}
+
+LCond::LCond()
+{
+	THREAD_ASSERT(pthread_cond_init(&this->m_impl, NULL));
+}
+
+LCond::~LCond()
+{
+	THREAD_ASSERT(pthread_cond_destroy(&this->m_impl));
+}
+
+void	LCond::Signal()
+{
+	THREAD_ASSERT(pthread_cond_signal(&this->m_impl));
+}
+
+void 	LCond::Broadcast()
+{
+	THREAD_ASSERT(pthread_cond_broadcast(&this->m_impl));
+}
+
+void	LCond::Wait(LMutex * mutex)
+{
+	THREAD_ASSERT(pthread_cond_wait(&this->m_impl, (pthread_mutex_t *)&mutex->m_impl));
+}
+
+LThreadStorage::LThreadStorage(void (* val_free_fn) (void *))
+{
+	THREAD_ASSERT(pthread_key_create(&this->m_impl, val_free_fn));
+}
+
+LThreadStorage::~LThreadStorage()
+{
+	THREAD_ASSERT(pthread_key_delete(this->m_impl));
+}
+
+void LThreadStorage::Set(void * key)
+{
+	THREAD_ASSERT(pthread_setspecific(this->m_impl, key));
+}
+
+void * LThreadStorage::Get()
+{
+	return pthread_getspecific(this->m_impl);
 }
 
 bool_t    lt_thread_create(LThread * thread, void * (* thread_func) (void *), void * user_data, bool_t joinable)
@@ -211,6 +264,82 @@ LThread    lt_thread_self()
 {
 	return (LThread)pthread_self();
 }
+
+#endif
+
+LMutex * lt_mutex_create()
+{
+	//FIXME - What is our stance on the new operator? 
+	// We should probably come up with our own 'lt_new' that checks. 
+	// [See lallocator.hpp]
+	LT_NEW_CPP(LMutex);
+}
+
+void	lt_mutex_lock(LMutex * self)
+{
+	LT_CALL_CPP(Lock);
+}
+
+bool_t	lt_mutex_trylock(LMutex * self)
+{
+	LT_RET_CALL_CPP(Trylock, FALSE);
+}
+
+void	lt_mutex_unlock(LMutex * self)
+{
+	LT_CALL_CPP(Unlock);
+}
+
+void	lt_mutex_destroy(LMutex * self)
+{
+	LT_DELETE_CPP();
+}	
+
+LCond * lt_cond_create()
+{
+	LT_NEW_CPP(LCond);
+}
+
+void	lt_cond_signal(LCond * self)
+{
+	LT_CALL_CPP(Signal);
+}
+
+void	lt_cond_broadcast(LCond * self)
+{
+	LT_CALL_CPP(Broadcast);
+}
+
+void	lt_cond_wait(LCond * self, LMutex * mutex)
+{
+	LT_CALL_CPP(Wait, mutex);
+}
+
+void	lt_cond_destroy(LCond * self)
+{
+	LT_DELETE_CPP();
+}
+
+LThreadStorage *  lt_thread_storage_create(void (* val_free_fn) (void *))
+{
+	LT_NEW_CPP(LThreadStorage, val_free_fn); 
+}
+
+void 	lt_thread_storage_set(LThreadStorage * self, void * key)
+{
+	LT_CALL_CPP(Set, key); 
+}
+
+void *	lt_thread_storage_get(LThreadStorage * self)
+{
+	LT_RET_CALL_CPP(Get, NULL);
+}
+
+void	lt_thread_storage_destroy(LThreadStorage * self)
+{
+	LT_DELETE_CPP();
+}
+
 void _lt_once_run(LOnce * once, void * (* init_func) (void *), void * user_data)
 {
 	_lt_once_mutex.Lock();

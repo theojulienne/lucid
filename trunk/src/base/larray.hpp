@@ -16,6 +16,7 @@ public:
     	bool_t Remove(void * value);
     	bool_t RemoveIndex(int i);
     	void Reverse();
+	void * Pop(int index);
     	void Sort(int (* list_compare_func) (const void * value1, 
                                             const void * value2));
     	void Foreach(void (* list_foreach_func) (const void * value, void * user_arg), 
@@ -86,10 +87,11 @@ template <class V = void *> class LArray: public LArrayImpl
 public:
 	LArray(void (* val_free_fn) (void *));
     	void Append(V value);
-    	void Insert(int i, V value);
+    	void Insert(int index, V value);
     	bool_t Remove(V value);
-    	V GetItem(int i);
-    	void SetItem(int i, V value);
+    	V GetItem(int index);
+	V Pop(int index);
+    	void SetItem(int index, V value);
 //    	V & operator[](int i); 
     	V * GetData();
 };
@@ -107,9 +109,9 @@ inline void LArray<V>::Append(V value)
 }
 
 template <class V>
-inline void LArray<V>::Insert(int i, V value)
+inline void LArray<V>::Insert(int index, V value)
 {
-    	LArrayImpl::Insert(i, (void *)&value);
+    	LArrayImpl::Insert(index, (void *)&value);
 }
 
 template <class V>
@@ -119,15 +121,21 @@ inline bool_t LArray<V>::Remove(V value)
 }
 
 template <class V>
-inline V LArray<V>::GetItem(int i)
+inline V LArray<V>::GetItem(int index)
 {
-    	return (V) * (V *)LArrayImpl::GetItem(i);
+    	return (V) * (V *)LArrayImpl::GetItem(index);
 }
 
 template <class V>
-inline void LArray<V>::SetItem(int i, V value)
+inline V LArray<V>::Pop(int index)
 {
-    	LArrayImpl::SetItem(i, (void *)&value);
+    	return (V) * (V *)LArrayImpl::Pop(index);
+}
+
+template <class V>
+inline void LArray<V>::SetItem(int index, V value)
+{
+    	LArrayImpl::SetItem(index, (void *)&value);
 }
 
 template <class V>
