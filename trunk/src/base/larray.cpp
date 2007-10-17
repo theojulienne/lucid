@@ -20,7 +20,64 @@ void lt_array_set_item(LArrayImpl * self, int index, void * value);
 void lt_array_clear(LArrayImpl * self);
 int lt_array_count(LArrayImpl * self);
 char * lt_array_get_data(LArrayImpl * self);
+LIter<>  lt_array_get_iter(LArrayImpl * self);
 
+}
+
+class LArrayIter: public LAllocator
+{
+public:
+	LArrayIter(LArrayImpl * array);
+	bool_t MoveNext();
+	void ** Current();
+private:
+	int m_cur;
+	LArrayImpl * m_array;
+};
+
+inline LArrayIter::LArrayIter(LArrayImpl * array)
+{
+	this->m_array = array;
+	this->m_cur = 0;
+}
+
+inline bool_t LArrayIter::MoveNext()
+{
+	if(this->m_cur == this->m_array->Count() - 1)
+		return FALSE;
+	else
+	{
+		this->m_cur += 1;	
+		return TRUE;
+	}
+}
+
+inline void ** LArrayIter::Current()
+{
+	return (void **)this->m_array->GetItem(this->m_cur);
+}
+
+void	_lt_array_iter_destroy(void * self)
+{
+	LArrayIter * iter = static_cast<LArrayIter *>(self);
+	delete iter;
+}
+
+bool_t LArrayImpl::MoveNext(void * self)
+{
+	LArrayIter * iter = static_cast<LArrayIter *>(self);
+	return iter->MoveNext();
+}
+
+void ** LArrayImpl::Current(void * self)
+{
+	LArrayIter * iter = static_cast<LArrayIter *>(self);
+	return iter->Current();
+}
+
+void * LArrayImpl::GetArrayIter()
+{
+	return (void *)new LArrayIter(this);
 }
 
 LArrayImpl::LArrayImpl(void (* val_free_fn) (void *), int elem_size): m_elem_size(elem_size)
@@ -192,3 +249,9 @@ char * lt_array_get_data(LArrayImpl * self)
 	LT_RET_CALL_CPP(GetData, NULL);
 }
    
+//FIXME- We probably need a "dummy" iterator declaration
+LIter<>  lt_array_get_iter(LArrayImpl * self)
+{
+	LT_RET_CALL_CPP(GetIter, LIter<>(NULL, NULL, NULL, NULL));
+}
+

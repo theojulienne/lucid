@@ -1,10 +1,14 @@
 #ifndef __LUCID_LARRAY_H__
 #define __LUCID_LARRAY_H__
 
-#include <glib.h>
 #include <string.h>
+#include <glib.h>
+
+#include <liter.h>
 
 #define LT_ARRAY_INDEX(i) (void *)(((this->m_impl)->data) + this->m_elem_size * (i))
+
+void	_lt_array_iter_destroy(void * self);
 
 class LArrayImpl
 {
@@ -26,8 +30,9 @@ public:
     	void Clear();
     	int Count(); 
     	char * GetData();
-    	   
+	LT_DEFINE_ITER_FULL(LArrayImpl, void *, _lt_array_iter_destroy, GetArrayIter());    	   
 private:
+	void * GetArrayIter();	
     	GArray * m_impl;
     	int m_elem_size;
     	void (* m_val_free_fn) (void *);

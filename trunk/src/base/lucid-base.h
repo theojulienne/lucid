@@ -9,6 +9,7 @@
 #include <ltypes.h>
 #include <latomic.h>
 #include <lthreading.h>
+#include <liter.h>
 
 G_BEGIN_DECLS
 
@@ -108,6 +109,7 @@ void lt_array_set_item(LArray * self, int index, void * value);
 void lt_array_clear(LArray * self);
 int lt_array_count(LArray * self);
 char * lt_array_get_data(LArray * self);
+LIter 	lt_array_get_iter(LArray * self);
 
 typedef void LHashtable;
 

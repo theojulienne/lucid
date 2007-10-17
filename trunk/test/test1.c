@@ -68,29 +68,37 @@ static void module_test()
 
 static void array_test()
 {
-    int i, len;
-    double x;
-    LArray * array = lt_array_create(NULL, sizeof(double));
-    x = 1;    
-    lt_array_append(array, &x);
-    x = 2;
-    lt_array_append(array, &x);
-    x = 3;    
-    lt_array_append(array, &x);
+	int i, len;
+   	double x;
+    	LArray * array = lt_array_create(NULL, sizeof(double));
+	LIter it;
+    	x = 1;    
+    	lt_array_append(array, &x);
+    	x = 2;
+    	lt_array_append(array, &x);
+    	x = 3;    
+    	lt_array_append(array, &x);
 
   //  x = 4;
   //  lt_array_set_item(array, 0, &x);
 
-    lt_array_reverse(array);
+    	lt_array_reverse(array);
 
-    len = lt_array_count(array);
+    	len = lt_array_count(array);
 
-    printf("%d\n", len);
+    	printf("%d\n", len);
 
-    for(i = 0; i < len; i++)
-        printf("%f\n", * (double *)lt_array_get_item(array, i));
+    	for(i = 0; i < len; i++)
+        	printf("%f\n", * (double *)lt_array_get_item(array, i));
 
-    lt_array_destroy(array);
+	it = lt_array_get_iter(array);
+	do
+	{
+		printf("%f\n", * (double *)lt_iter_current(it));
+	} while(lt_iter_move_next(it));
+	lt_iter_destroy(it);
+	
+   	lt_array_destroy(array);
 }
 
 static void _set_foreach_cb(const void * element, void * user_arg)
