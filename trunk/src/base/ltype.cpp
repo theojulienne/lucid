@@ -75,7 +75,7 @@ LType * LType::Register(const char * klass_name,
     	type->m_klass_name = klass_name;
     	type->m_super_klass = super_klass;
     	type->m_create_func = create_func;
-    	type->m_events = new LArray<char *>(g_free);
+    	type->m_events = new LArray<char *>((void (*) (char *))g_free);
 
     	_lt_type_table->Insert(klass_name, type);
 

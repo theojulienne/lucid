@@ -23,7 +23,7 @@ flags
 		(cairo) cflags "-I/usr/local/include/cairo -I/usr/include/cairo"
 		(cairo) ldflags "-L/usr/local/lib -lcairo"
 	platform posix
-		pkg-config "gtk+-2.0 gdk-2.0"
+		pkg-config "glib-2.0 gmodule-2.0 gthread-2.0 sigc++-2.0"
 		(cairo) pkg-config "cairo"
 	platform all
 		(!cairo) define NO_CAIRO

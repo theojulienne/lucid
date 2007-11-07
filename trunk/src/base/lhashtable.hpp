@@ -104,11 +104,11 @@ public:
 template <class K = void *, class V = void *> class LHashtable: public LHashtableImpl
 {
 public:
-	LHashtable(unsigned int (* hash_fn) (const void *),
-                bool_t (* key_eq_fn) (const void *, const void *),
-                void (* key_free_fn) (void *), 
-                void (* val_free_fn) (void *));       
-    	LHashtable(bool_t owns_strings, void (* val_free_fn) (void *)); 
+	LHashtable(unsigned int (* hash_fn) (K),
+                bool_t (* key_eq_fn) (K, K),
+                void (* key_free_fn) (K), 
+                void (* val_free_fn) (V));       
+    	LHashtable(bool_t owns_strings, void (* val_free_fn) (V)); 
     	void Insert(K key, V value);
    	V Lookup(const K key);
     	bool_t LookupExtended(const K key, K * orig_key, V * value);
@@ -119,17 +119,19 @@ public:
 };
 
 template <class K, class V>
-inline LHashtable<K, V>::LHashtable(unsigned int (* hash_fn) (const void *),
-                bool_t (* key_eq_fn) (const void *, const void *),
-                void (* key_free_fn) (void *), 
-                void (* val_free_fn) (void *)): LHashtableImpl(hash_fn, key_eq_fn, 
-                                                    key_free_fn, val_free_fn)
+inline LHashtable<K, V>::LHashtable(unsigned int (* hash_fn) (K),
+                bool_t (* key_eq_fn) (K, K),
+                void (* key_free_fn) (K), 
+                void (* val_free_fn) (V)): 
+LHashtableImpl((unsigned int (*) (const void *))hash_fn, 
+		(bool_t (*) (const void *, const void *)) key_eq_fn, 
+                (void (*) (void *))key_free_fn, (void (*) (void *))val_free_fn)
 {
 }
 
 template <class K, class V>
-inline LHashtable<K, V>::LHashtable(bool_t owns_strings, void (* val_free_fn) (void *)):
-    	LHashtableImpl(owns_strings, val_free_fn) 
+inline LHashtable<K, V>::LHashtable(bool_t owns_strings, void (* val_free_fn) (V)):
+    	LHashtableImpl(owns_strings, (void (*) (void *))val_free_fn) 
 {
 }
 

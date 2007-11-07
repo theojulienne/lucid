@@ -168,6 +168,7 @@ static void object_test()
     g_print("%s: %d\n", __FUNCTION__, (int)lt_object_find_handler(obj, _test_foo, (void *)0xdeadbeef));
 
     g_assert(lt_object_remove_handler(obj, id2));
+    g_assert(lt_object_remove_handler(obj, id2));
 
     lt_base_unref(LT_BASE(obj));
 

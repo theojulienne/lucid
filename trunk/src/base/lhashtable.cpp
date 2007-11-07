@@ -9,8 +9,8 @@ typedef void hashtable_foreach_func(const void * key, const void * value, void *
 extern "C"
 {
 
-LHashtable<> * lt_hashtable_create(unsigned int (* hash_fn) (const void *),
-                bool_t (* key_eq_fn) (const void *, const void *),
+LHashtable<> * lt_hashtable_create(unsigned int (* hash_fn) (void *),
+                bool_t (* key_eq_fn) (void *, void *),
                 void (* key_free_fn) (void *), 
                 void (* val_free_fn) (void *));
 LHashtable<> * lt_hashtable_str_create(bool_t owns_strings, void (* val_free_fn) (void *));
@@ -63,8 +63,8 @@ LArray<> * LHashtableImpl::GetPairs()
     	return reinterpret_cast<LArray<> *>(pairs);
 }
 
-LHashtable<> * lt_hashtable_create(unsigned int (* hash_fn) (const void *),
-                bool_t (* key_eq_fn) (const void *, const void *),
+LHashtable<> * lt_hashtable_create(unsigned int (* hash_fn) (void *),
+                bool_t (* key_eq_fn) (void *, void *),
                 void (* key_free_fn) (void *), 
                 void (* val_free_fn) (void *))      
 {

@@ -16,7 +16,9 @@ targets
 			ltype.cpp
 			lxml.cpp
 			lset.cpp
-			lthreading.cpp			
+			lthreading.cpp
+			liter.cpp
+			glibarrayimpl.cpp			
 			platform !posix
 				eglib/src/garray.c
 				eglib/src/gdate.c
@@ -78,7 +80,7 @@ flags
 	platform darwin
 		library "iconv"
 	platform posix
-		pkg-config "glib-2.0 gmodule-2.0"
+		pkg-config "glib-2.0 gmodule-2.0 gthread-2.0 sigc++-2.0"
 		define REENTRANT 
 	platform win32
 		library "psapi"

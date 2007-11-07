@@ -6,9 +6,9 @@
 template <class V = void *> class LSet: public LBase
 {
 public:
-	LSet(unsigned int (* hash_fn) (const void *),
-                bool_t (* key_eq_fn) (const void *, const void *),
-                void (* key_free_fn) (void *));
+	LSet(unsigned int (* hash_fn) (V),
+                bool_t (* key_eq_fn) (V, V),
+                void (* key_free_fn) (V));
 	LSet(bool_t owns_strings);	
 	void Add(V element);
 	bool_t Remove(V element);
@@ -27,9 +27,9 @@ void _lt_set_foreach_impl(LSet<> * self, void (* set_foreach_func) (const void *
                     void * user_arg);
 
 template <class V> 
-inline LSet<V>::LSet(unsigned int (* hash_fn) (const void *),
-                bool_t (* key_eq_fn) (const void *, const void *),
-                void (* key_free_fn) (void *)): m_data(hash_fn, key_eq_fn, key_free_fn, NULL)
+inline LSet<V>::LSet(unsigned int (* hash_fn) (V),
+                bool_t (* key_eq_fn) (V, V),
+                void (* key_free_fn) (V)): m_data(hash_fn, key_eq_fn, key_free_fn, NULL)
 {
 }
 

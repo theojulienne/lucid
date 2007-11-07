@@ -31,25 +31,12 @@ public:
 	~LIterImpl();
 	bool_t MoveNext();
 	void * Current();
-private:
+protected:
 	bool_t (* m_move_next_fn) (void *);
 	void * (* m_get_cur_fn) (void *);
 	void (* m_val_free_fn) (void *);
 	void * m_obj;
 };
-
-LIterImpl::LIterImpl(bool_t (* move_next_fn) (void *), 
-			void * (* get_cur_fn) (void *),
-			void (* val_free_fn) (void *), 
-			void * obj)
-{
-	g_assert(move_next_fn != NULL);
-	g_assert(get_cur_fn != NULL);
-	this->m_move_next_fn = move_next_fn;
-	this->m_get_cur_fn = get_cur_fn;
-	this->m_val_free_fn = val_free_fn;
-	this->m_obj = obj;
-}
 
 inline LIterImpl::~LIterImpl()
 {
@@ -67,13 +54,16 @@ inline void * LIterImpl::Current()
 	return this->m_get_cur_fn(this->m_obj);
 }
 
-template <class V = void *> class LIter: LIterImpl
+LIterImpl lt_iter_dummy();
+
+template <class V = void *> class LIter: public LIterImpl
 {
 public:
 	LIter(bool_t (* move_next_fn) (void *), 
 			void * (* get_cur_fn) (void *),
 			void (* val_free_fn) (void *), 
 			void * obj);
+	LIter(LIterImpl impl);
 	bool_t MoveNext();
 	V Current();
 };
@@ -83,6 +73,11 @@ inline LIter<V>::LIter(bool_t (* move_next_fn) (void *),
 			void * (* get_cur_fn) (void *),
 			void (* val_free_fn) (void *), 
 			void * obj): LIterImpl(move_next_fn, get_cur_fn, val_free_fn, obj)
+{
+}
+
+template <class V>
+inline LIter<V>::LIter(LIterImpl impl): LIterImpl(impl)
 {
 }
 
@@ -109,6 +104,8 @@ typedef struct
 	void (* m_val_free_fn) (void *);
 	void * m_obj;
 }	LIter;
+
+LIter	lt_iter_dummy();
 
 #define	lt_iter_move_next(it)	(&it)->m_move_next_fn((&it)->m_obj)
 #define	lt_iter_current(it)	(&it)->m_get_cur_fn((&it)->m_obj)

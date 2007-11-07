@@ -3,8 +3,8 @@
 extern "C"
 {
 
-LSet<> * lt_set_create(unsigned int (* hash_fn) (const void *),
-                bool_t (* key_eq_fn) (const void *, const void *),
+LSet<> * lt_set_create(unsigned int (* hash_fn) (void *),
+                bool_t (* key_eq_fn) (void *, void *),
                 void (* key_free_fn) (void *));
 LSet<> * lt_set_str_create(bool_t owns_strings);
 void lt_set_add(LSet<> * self, void * element);
@@ -36,8 +36,8 @@ void _lt_set_foreach_impl(LSet<> * self, void (* set_foreach_func) (const void *
 	g_hash_table_foreach((GHashTable *)self->GetImpl(), _ghash_foreach_cb, (void *)args);
 }
 
-LSet<> * lt_set_create(unsigned int (* hash_fn) (const void *),
-                bool_t (* key_eq_fn) (const void *, const void *),
+LSet<> * lt_set_create(unsigned int (* hash_fn) (void *),
+                bool_t (* key_eq_fn) (void *, void *),
                 void (* key_free_fn) (void *))
 {
 	LT_NEW_CPP(LSet<>, hash_fn, key_eq_fn, key_free_fn);
