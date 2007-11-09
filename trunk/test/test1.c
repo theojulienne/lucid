@@ -82,21 +82,27 @@ static void array_test()
   //  x = 4;
   //  lt_array_set_item(array, 0, &x);
 
-    	lt_array_reverse(array);
-
     	len = lt_array_count(array);
 
     	printf("%d\n", len);
 
-    	for(i = 0; i < len; i++)
-        	printf("%f\n", * (double *)lt_array_get_item(array, i));
-
 	it = lt_array_get_iter(array);
 	do
 	{
-		printf("%f\n", * (double *)lt_iter_current(it));
+		double * d = (double *)lt_iter_current(it);
+		if(d)		
+			printf("%f\n", * d);
 	} while(lt_iter_move_next(it));
 	lt_iter_destroy(it);
+
+	lt_array_reverse(array);
+
+    	for(i = 0; i < len; i++)
+        {
+		double * d = (double *)lt_array_get_item(array, i);
+		if(d)
+			printf("%f\n", * d);
+	}
 	
    	lt_array_destroy(array);
 }

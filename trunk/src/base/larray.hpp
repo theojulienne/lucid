@@ -8,34 +8,56 @@
 
 void	_lt_array_iter_destroy(void * self);
 
+class LArrayImpl;
+
+class LArrayInst: public LAllocator
+{
+public:
+	LArrayInst(LArrayImpl * impl, void (* val_free_fn) (void *), int elem_size);
+	virtual ~LArrayInst() {}
+	LArrayImpl * GetImpl();
+	int GetElemSize();
+	LT_DEFINE_ITER_FULL(LArrayInst, void *, _lt_array_iter_destroy, GetArrayIter());     
+protected:
+	int m_elem_size;
+	LArrayImpl * m_impl;
+	void * GetArrayIter();	
+};
+
+inline LArrayImpl * LArrayInst::GetImpl()
+{
+	return this->m_impl;
+}
+
+inline int LArrayInst::GetElemSize()
+{
+	return this->m_elem_size;
+}
+
 class LArrayImpl
 {
 public:
-	LArrayImpl(void (* val_free_fn) (void *), int elem_size);
+	LArrayImpl();
 	virtual ~LArrayImpl() {}
-	virtual void Append(void * value) = 0;
-    	virtual void Insert(int i, void * value) = 0;
-    	bool_t Remove(void * value);
-    	virtual bool_t RemoveIndex(int i) = 0;
-	virtual bool_t RemoveRange(int i, int len) = 0;
-    	void Reverse();
-	void * Pop(int index);
-    	virtual void Sort(int (* list_compare_func) (const void * value1, 
+	virtual LArrayInst * Create(void (* val_free_fn) (void *), int elem_size) = 0;
+	virtual void Append(LArrayInst * inst, void * value) = 0;
+    	virtual void Insert(LArrayInst * inst, int i, void * value) = 0;
+    	bool_t Remove(LArrayInst * inst, void * value);
+    	virtual bool_t RemoveIndex(LArrayInst * inst, int i) = 0;
+	virtual bool_t RemoveRange(LArrayInst * inst, int i, int len) = 0;
+    	void Reverse(LArrayInst * inst);
+	void * Pop(LArrayInst * inst, int index);
+    	virtual void Sort(LArrayInst * inst, int (* list_compare_func) (const void * value1, 
                                             const void * value2)) = 0;
-    	void Foreach(void (* list_foreach_func) (const void * value, void * user_arg), 
-                    void * user_arg);
-    	virtual void * GetItem(int i) = 0;
-    	virtual void SetItem(int i, void * value) = 0;      
-    	void Clear();
-    	virtual int Count() = 0; 
-    	virtual char * GetData() = 0;
-	LT_DEFINE_ITER_FULL(LArrayImpl, void *, _lt_array_iter_destroy, GetArrayIter());    
-	static LArrayImpl * CreateDefault(
-		void (* val_free_fn) (void *), int elem_size);	   
-protected:
-	void * GetArrayIter();	
-    	int m_elem_size;
-    	void (* m_val_free_fn) (void *);
+    	void Foreach(LArrayInst * inst, void (* list_foreach_func) (const void * value, 
+		void * user_arg), void * user_arg);
+    	virtual void * GetItem(LArrayInst * inst, int i) = 0;
+    	virtual void SetItem(LArrayInst * inst, int i, void * value) = 0;      
+    	void Clear(LArrayInst * inst);
+    	virtual int Count(LArrayInst * inst) = 0; 
+    	virtual char * GetData(LArrayInst * inst) = 0;
+
+	static LArrayInst * CreateDefault(void (* val_free_fn) (void *), int elem_size);
 };
 
 template <class V = void *> class LArray: public LAllocator
@@ -59,70 +81,70 @@ public:
     	int Count();
 //    	V & operator[](int i); 
     	V * GetData();
-	LArrayImpl * GetImpl();
+	LArrayInst * GetInst();
 	LIter<V> GetIter();
 private:
-	LArrayImpl * m_impl;
+	LArrayInst * m_inst;
 };
 
 template <class V> 
 inline LArray<V>::LArray(void (* val_free_fn) (V), int elem_size)
 {
-	this->m_impl = LArrayImpl::CreateDefault((void (*) (void *))val_free_fn, elem_size);
+	this->m_inst = LArrayImpl::CreateDefault((void (*) (void *))val_free_fn, elem_size);
 }
 
 template <class V> 
 inline LArray<V>::~LArray()
 {
-	delete this->m_impl;
+	delete this->m_inst;
 }
 
 template <class V>
-inline LArrayImpl * LArray<V>::GetImpl()
+inline LArrayInst * LArray<V>::GetInst()
 {
-    	return this->m_impl;
+    	return this->m_inst;
 }
 
 template <class V>
 inline void LArray<V>::Append(V value)
 {
-    	this->m_impl->Append((void *)&value);
+    	this->m_inst->GetImpl()->Append(this->m_inst, (void *)&value);
 }
 
 template <class V>
 inline void LArray<V>::Insert(int index, V value)
 {
-    	this->m_impl->Insert(index, (void *)&value);
+    	this->m_inst->GetImpl()->Insert(this->m_inst, index, (void *)&value);
 }
 
 template <class V>
 inline bool_t LArray<V>::Remove(V value)
 {
-    	return this->m_impl->Remove((void *)&value);
+    	return this->m_inst->GetImpl()->Remove(this->m_inst, (void *)&value);
 }
 
 template <class V>
 inline bool_t LArray<V>::RemoveIndex(int index)
 {
-    	return this->m_impl->RemoveIndex(index);
+    	return this->m_inst->GetImpl()->RemoveIndex(this->m_inst, index);
 }
 
 template <class V>
 inline bool_t LArray<V>::RemoveRange(int index, int length)
 {
-    	return this->m_impl->RemoveRange(index, length);
+    	return this->m_inst->GetImpl()->RemoveRange(this->m_inst, index, length);
 }
 
 template <class V>
 inline V * LArray<V>::GetItem(int index)
 {
-    	return (V *)this->m_impl->GetItem(index);
+    	return (V *)this->m_inst->GetImpl()->GetItem(this->m_inst, index);
 }
 
 template <class V>
 inline V * LArray<V>::Pop(int index)
 {
-    	return (V *)this->m_impl->Pop(index);
+    	return (V *)this->m_inst->GetImpl()->Pop(this->m_inst, index);
 }
 
 template <class V>
@@ -142,37 +164,38 @@ inline void LArray<V>::Foreach(void (* list_foreach_func) (V value, void * user_
 template <class V>
 inline void LArray<V>::SetItem(int index, V value)
 {
-    	this->m_impl->SetItem(index, (void *)&value);
+    	this->m_inst->GetImpl()->SetItem(this->m_inst, index, (void *)&value);
 }
 
 template <class V>
 inline V * LArray<V>::GetData()
 {
-    	return (V *)this->m_impl->GetData();
+    	return (V *)this->m_inst->GetImpl()->GetData(this->m_inst);
 }
 
 template <class V>
 inline void LArray<V>::Reverse()
 {
-	this->m_impl->Reverse();
+	this->m_inst->GetImpl()->Reverse(this->m_inst);
 }
 
 template <class V>
 inline void LArray<V>::Clear()
 {
-	this->m_impl->Clear();
+	this->m_inst->GetImpl()->Clear(this->m_inst);
 }
 
 template <class V>
 inline int LArray<V>::Count()
 {
-	return this->m_impl->Count();
+	return this->m_inst->GetImpl()->Count(this->m_inst);
 }
+
 
 template <class V>
 inline LIter<V> LArray<V>::GetIter()
 {
-	return static_cast<LIter<V> >(this->m_impl->GetIter());
+	return static_cast<LIter<V> >(this->m_inst->GetIter());
 }
 
 /*

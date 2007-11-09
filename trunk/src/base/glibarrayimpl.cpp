@@ -1,49 +1,83 @@
 #include <lucid-base.h>
 
-#define LT_ARRAY_INDEX(i) (void *)(((this->m_impl)->data) + this->m_elem_size * (i))
+#define LT_ARRAY_INDEX(i) (void *)(((dynamic_cast<GLibArrayInst *>(inst)->m_array)->data) + inst->GetElemSize() * (i))
+
+class GLibArrayInst: public LArrayInst
+{
+public:
+	GLibArrayInst(LArrayImpl * impl, void (* val_free_fn) (void *), int elem_size);
+	~GLibArrayInst();
+	
+	GArray * m_array;
+private:
+    	void (* m_val_free_fn) (void *);
+};
+
+GLibArrayInst::GLibArrayInst(LArrayImpl * impl, void (* val_free_fn) (void *), int elem_size): 		LArrayInst(impl, val_free_fn, elem_size)
+{
+	g_assert(elem_size > 0);
+	this->m_array = g_array_new(FALSE, TRUE, elem_size);
+	g_assert(this->m_array != NULL);
+	this->m_val_free_fn = val_free_fn;
+	this->m_elem_size = elem_size;
+}
+
+GLibArrayInst::~GLibArrayInst()
+{
+	if(this->m_val_free_fn != NULL)
+    	{        
+        	for(int i = 0; i < (int)this->m_array->len; i++)
+            		this->m_val_free_fn((void *)((this->m_array->data) + 
+				this->m_elem_size * (i)));    
+    	}
+    	g_array_free(this->m_array, TRUE);    
+}
 
 class GLibArrayImpl: public LArrayImpl
 {
 public:
-	GLibArrayImpl(void (* val_free_fn) (void *), int elem_size);
+	GLibArrayImpl();
 	~GLibArrayImpl();
-	void Append(void * value);
-    	void Insert(int i, void * value);
-    	bool_t RemoveIndex(int i);
-	bool_t RemoveRange(int i, int len);
-    	void Sort(int (* list_compare_func) (const void * value1, 
+	LArrayInst * Create(void (* val_free_fn) (void *), int elem_size);
+	void Append(LArrayInst * inst, void * value);
+    	void Insert(LArrayInst * inst, int i, void * value);
+    	bool_t RemoveIndex(LArrayInst * inst, int i);
+	bool_t RemoveRange(LArrayInst * inst, int i, int len);
+    	void Sort(LArrayInst * inst, int (* list_compare_func) (const void * value1, 	
                                             const void * value2));
-    	void * GetItem(int i);
-    	void SetItem(int i, void * value);      
-    	int Count(); 
-    	char * GetData();
-private:
-	GArray * m_impl;
+    	void * GetItem(LArrayInst * inst, int i);
+    	void SetItem(LArrayInst * inst, int i, void * value);      
+    	int Count(LArrayInst * inst); 
+    	char * GetData(LArrayInst * inst);
+	
+	static LArrayImpl * Get();
+	static LArrayImpl * g_singleton;
 };
 
-GLibArrayImpl::GLibArrayImpl(void (* val_free_fn) (void *), int elem_size): 
-	LArrayImpl(val_free_fn, elem_size)
+GLibArrayImpl::GLibArrayImpl()
 {
-	this->m_impl = g_array_new(FALSE, TRUE, elem_size);
-	g_assert(this->m_impl != NULL);
 }
 
 GLibArrayImpl::~GLibArrayImpl()
 {
-	if(this->m_val_free_fn != NULL)
-    	{        
-        	for(int i = 0; i < this->Count(); i++)
-            		this->m_val_free_fn(LT_ARRAY_INDEX(i));    
-    	}
-    	g_array_free(this->m_impl, TRUE);    
 }
 
-void GLibArrayImpl::Append(void * value)
+LArrayImpl * GLibArrayImpl::g_singleton = NULL;
+
+LArrayImpl * GLibArrayImpl::Get()
 {
-	g_array_append_vals(this->m_impl, value, 1);
+	if(g_singleton == NULL)
+		g_singleton = new GLibArrayImpl;
+	return g_singleton;
 }
 
-void GLibArrayImpl::Insert(int index, void * value)
+void GLibArrayImpl::Append(LArrayInst * inst, void * value)
+{
+	g_return_if_fail(inst != NULL);
+	g_array_append_vals(dynamic_cast<GLibArrayInst *>(inst)->m_array, value, 1);
+}
+
+void GLibArrayImpl::Insert(LArrayInst * inst, int index, void * value)
 {
 //TODO- Should we use this slightly more sane implementation?
 /*
@@ -67,58 +101,71 @@ void GLibArrayImpl::Insert(int index, void * value)
         array->pdata[i + 1] = array->pdata[i];
     array->pdata[index] = value;
 */
-	g_array_insert_vals(this->m_impl, index, value, 1);
+	g_return_if_fail(inst != NULL);
+	g_array_insert_vals(dynamic_cast<GLibArrayInst *>(inst)->m_array, index, value, 1);
 }
 
-bool_t GLibArrayImpl::RemoveIndex(int i)
+bool_t GLibArrayImpl::RemoveIndex(LArrayInst * inst, int i)
 {
-	g_array_remove_index(this->m_impl, i);
+	g_return_val_if_fail(inst != NULL, FALSE);
+	g_array_remove_index(dynamic_cast<GLibArrayInst *>(inst)->m_array, i);
 	return TRUE;
 }
 
-bool_t GLibArrayImpl::RemoveRange(int i, int len)
+bool_t GLibArrayImpl::RemoveRange(LArrayInst * inst, int i, int len)
 {
-	g_array_remove_range(this->m_impl, i, len);
+	g_return_val_if_fail(inst != NULL, FALSE);
+	g_array_remove_range(dynamic_cast<GLibArrayInst *>(inst)->m_array, i, len);
 	return TRUE;
 }
 
-void GLibArrayImpl::Sort(int (* list_compare_func) (const void * value1, 
+void GLibArrayImpl::Sort(LArrayInst * inst, int (* list_compare_func) (const void * value1, 
                                             const void * value2))
 {
+	g_return_if_fail(inst != NULL);
 	g_return_if_fail(list_compare_func != NULL);
-	g_array_sort(this->m_impl, (GCompareFunc)list_compare_func);    
+	g_array_sort(dynamic_cast<GLibArrayInst *>(inst)->m_array, (GCompareFunc)list_compare_func);    
 }
 
 //FIXME-confirm that my bounds checks are sane (and not useless!)
-void * GLibArrayImpl::GetItem(int i)
+void * GLibArrayImpl::GetItem(LArrayInst * inst, int i)
 {
+	g_return_val_if_fail(inst != NULL, NULL);
 	g_return_val_if_fail(i >= 0, NULL);
-	g_return_val_if_fail(i <= (int)this->m_impl->len, NULL);
+	g_return_val_if_fail(i <= (int)dynamic_cast<GLibArrayInst *>(inst)->m_array->len, NULL);
 	return LT_ARRAY_INDEX(i);
 }
     
 //FIXME-confirm that my bounds checks are sane (and not useless!)
-void GLibArrayImpl::SetItem(int i, void * value)
+void GLibArrayImpl::SetItem(LArrayInst * inst, int i, void * value)
 {
+	g_return_if_fail(inst != NULL);
 	g_return_if_fail(i >= 0);
-	g_return_if_fail(i <= (int)this->m_impl->len);
+	g_return_if_fail(i <= (int)dynamic_cast<GLibArrayInst *>(inst)->m_array->len);
 	g_return_if_fail(value != NULL);
-	memmove(LT_ARRAY_INDEX(i), value, this->m_elem_size);
+	memmove(LT_ARRAY_INDEX(i), value, inst->GetElemSize());
 }
 
-int GLibArrayImpl::Count()
+int GLibArrayImpl::Count(LArrayInst * inst)
 {
-	return this->m_impl->len;
+	g_return_val_if_fail(inst != NULL, -1);
+	return dynamic_cast<GLibArrayInst *>(inst)->m_array->len;
 }
 
-char * GLibArrayImpl::GetData()
+char * GLibArrayImpl::GetData(LArrayInst * inst)
 {
-	return this->m_impl->data;
+	g_return_val_if_fail(inst != NULL, NULL);
+	return dynamic_cast<GLibArrayInst *>(inst)->m_array->data;
 }
 
-LArrayImpl * LArrayImpl::CreateDefault(void (* val_free_fn) (void *), int elem_size)
+LArrayInst * GLibArrayImpl::Create(void (* val_free_fn) (void *), int elem_size)
 {
-	GLibArrayImpl * impl = new GLibArrayImpl(val_free_fn, elem_size);
-	return dynamic_cast<LArrayImpl *>(impl);	
+	return dynamic_cast<LArrayInst *>(new GLibArrayInst(this, val_free_fn, elem_size));
+}
+
+
+LArrayInst * LArrayImpl::CreateDefault(void (* val_free_fn) (void *), int elem_size)
+{
+	return GLibArrayImpl::Get()->Create(val_free_fn, elem_size);
 }
 
