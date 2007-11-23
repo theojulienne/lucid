@@ -51,30 +51,30 @@ inline LArray<char *> * LType::GetEvents()
 }
  
 #define LT_DEFINE_TYPE(cpp_klass, c_name, super_klass) \
-extern "C" LType * c_name##_register_type(); \
+extern "C" LType * c_name##_get_type(); \
 cpp_klass::cpp_klass () \
 { \
-	m_type = c_name##_register_type(); \
-	this->SetupEvents(); \
-    	this->Construct(); \
+    m_type = c_name##_get_type(); \
+    this->SetupEvents(); \
+    this->Construct(); \
 } \
 static void * c_name##_ctor() \
 { \
-    	LT_NEW_CPP(cpp_klass); \
+    LT_NEW_CPP(cpp_klass); \
 } \
 extern "C" cpp_klass * c_name##_create() \
 { \
-	return (cpp_klass *)LType::CreateInstance(c_name##_register_type()); \
+	return (cpp_klass *)LType::CreateInstance(c_name##_get_type()); \
 } \
-extern "C" LType * c_name##_register_type() \
+extern "C" LType * c_name##_get_type() \
 { \
 	static LType * type = NULL; \
-    	if(type == NULL) \
-    	{ \
-        	type = LType::Register(#cpp_klass, super_klass, c_name##_ctor); \
-        	g_assert(cpp_klass::RegisterEvents(type)); \
-    	} \
-    	return type; \
+    if(type == NULL) \
+    { \
+        type = LType::Register(#cpp_klass, super_klass, c_name##_ctor); \
+        g_assert(cpp_klass::RegisterEvents(type)); \
+    } \
+    return type; \
 } 
 
 #endif

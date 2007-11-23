@@ -10,7 +10,7 @@ public:
 	
 	GArray * m_array;
 private:
-    	void (* m_val_free_fn) (void *);
+    void (* m_val_free_fn) (void *);
 };
 
 GLibArrayInst::GLibArrayInst(LArrayImpl * impl, void (* val_free_fn) (void *), int elem_size): 		LArrayInst(impl, val_free_fn, elem_size)
@@ -25,12 +25,11 @@ GLibArrayInst::GLibArrayInst(LArrayImpl * impl, void (* val_free_fn) (void *), i
 GLibArrayInst::~GLibArrayInst()
 {
 	if(this->m_val_free_fn != NULL)
-    	{        
-        	for(int i = 0; i < (int)this->m_array->len; i++)
-            		this->m_val_free_fn((void *)((this->m_array->data) + 
-				this->m_elem_size * (i)));    
-    	}
-    	g_array_free(this->m_array, TRUE);    
+    {        
+        for(int i = 0; i < (int)this->m_array->len; i++)
+            this->m_val_free_fn((void *)((this->m_array->data) + this->m_elem_size * (i)));    
+    }
+    g_array_free(this->m_array, TRUE);    
 }
 
 class GLibArrayImpl: public LArrayImpl
@@ -40,15 +39,15 @@ public:
 	~GLibArrayImpl();
 	LArrayInst * Create(void (* val_free_fn) (void *), int elem_size);
 	void Append(LArrayInst * inst, void * value);
-    	void Insert(LArrayInst * inst, int i, void * value);
-    	bool_t RemoveIndex(LArrayInst * inst, int i);
+    void Insert(LArrayInst * inst, int i, void * value);
+    bool_t RemoveIndex(LArrayInst * inst, int i);
 	bool_t RemoveRange(LArrayInst * inst, int i, int len);
-    	void Sort(LArrayInst * inst, int (* list_compare_func) (const void * value1, 	
+    void Sort(LArrayInst * inst, int (* list_compare_func) (const void * value1, 	
                                             const void * value2));
-    	void * GetItem(LArrayInst * inst, int i);
-    	void SetItem(LArrayInst * inst, int i, void * value);      
-    	int Count(LArrayInst * inst); 
-    	char * GetData(LArrayInst * inst);
+    void * GetItem(LArrayInst * inst, int i);
+    void SetItem(LArrayInst * inst, int i, void * value);      
+    int Count(LArrayInst * inst); 
+    char * GetData(LArrayInst * inst);
 	
 	static LArrayImpl * Get();
 	static LArrayImpl * g_singleton;
@@ -162,7 +161,6 @@ LArrayInst * GLibArrayImpl::Create(void (* val_free_fn) (void *), int elem_size)
 {
 	return dynamic_cast<LArrayInst *>(new GLibArrayInst(this, val_free_fn, elem_size));
 }
-
 
 LArrayInst * LArrayImpl::CreateDefault(void (* val_free_fn) (void *), int elem_size)
 {

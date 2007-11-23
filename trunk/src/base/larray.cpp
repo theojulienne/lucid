@@ -102,35 +102,35 @@ bool_t LArrayImpl::Remove(LArrayInst * inst, void * value)
 	for (int i = 0; i < this->Count(inst); i ++)
 	{
 		const void * p1 = (const void *)this->GetItem(inst, i), * p2 = (const void *)value;
-      		if (memcmp(p1, p2, elem_size) == 0)
-	  		return this->RemoveIndex(inst, i);
-    	}
+        if (memcmp(p1, p2, elem_size) == 0)
+            return this->RemoveIndex(inst, i);
+    }
   	return FALSE;
 }
 
 //FIXME- Test this a bit more thoroughly - and make more generalized
 void LArrayImpl::Reverse(LArrayInst * inst)
 {
-    	void * tmp;
-    	int i, j;
+    void * tmp;
+    int i, j;
 
 	g_return_if_fail(inst != NULL);
 
-    	tmp = g_malloc(inst->GetElemSize());
-    	g_assert(tmp != NULL);
+    tmp = g_malloc(inst->GetElemSize());
+    g_assert(tmp != NULL);
 
-    	j = inst->GetImpl()->Count(inst) - 1;
+    j = inst->GetImpl()->Count(inst) - 1;
 
-    	for(i = 0; i < j; i++, j--)
-    	{	
-		void * i_p = inst->GetImpl()->GetItem(inst, i);
+    for(i = 0; i < j; i++, j--)
+    {	
+	    void * i_p = inst->GetImpl()->GetItem(inst, i);
 		void * j_p = inst->GetImpl()->GetItem(inst, j);
-        	memmove(tmp, i_p, inst->GetElemSize()); 
-       		inst->GetImpl()->SetItem(inst, i, j_p);
-        	inst->GetImpl()->SetItem(inst, j, tmp);        
-    	}    
+        memmove(tmp, i_p, inst->GetElemSize()); 
+       	inst->GetImpl()->SetItem(inst, i, j_p);
+        inst->GetImpl()->SetItem(inst, j, tmp);        
+    }    
 
-    	g_free(tmp);
+    g_free(tmp);
 }
 
 void * LArrayImpl::Pop(LArrayInst * inst, int index)
@@ -156,16 +156,6 @@ void * LArrayImpl::Pop(LArrayInst * inst, int index)
 	return value;
 }
 
-void LArrayImpl::Foreach(LArrayInst * inst, void (* list_foreach_func) (const void * value, 
-	void * user_arg), void * user_arg)
-{
-	g_return_if_fail(inst != NULL);
-    	g_return_if_fail(list_foreach_func != NULL);
-    
-    	for(int i = 0, len = this->Count(inst); i < len; i++)
-        	list_foreach_func((const void *)this->GetItem(inst, i), user_arg);
-}
-
 void LArrayImpl::Clear(LArrayInst * inst)
 {
 	g_return_if_fail(inst != NULL);
@@ -185,13 +175,13 @@ void lt_array_destroy(LArray<> * self)
 void lt_array_append(LArray<> * self, void * value)
 {
 	g_return_if_fail(self != NULL);
-    	self->GetInst()->GetImpl()->Append(self->GetInst(), (void *)value);
+    self->GetInst()->GetImpl()->Append(self->GetInst(), (void *)value);
 }
 
 void lt_array_insert(LArray<> * self, int index, void * value)
 {
 	g_return_if_fail(self != NULL);
-    	self->GetInst()->GetImpl()->Insert(self->GetInst(), index, (void *)value);
+    self->GetInst()->GetImpl()->Insert(self->GetInst(), index, (void *)value);
 }
 
 bool_t lt_array_remove(LArray<> * self, void * value)
@@ -214,10 +204,11 @@ void lt_array_sort(LArray<> * self, int (* list_compare_func) (void * value1, vo
 	LT_CALL_CPP(Sort, list_compare_func);
 }
 
-void lt_array_foreach(LArray<> * self, void (* list_foreach_func) (void * value, void * user_arg), 
+void lt_array_foreach(LArray<> * self, void (* foreach_func) (void * value, void * user_arg), 
 	void * user_arg)
 {
-	LT_CALL_CPP(Foreach, list_foreach_func, user_arg);
+    //FIXME- Fix our casting issues.
+	LT_CALL_CPP(Foreach, (void (*)(void**, void*))foreach_func, user_arg);
 }
 
 void * lt_array_get_item(LArray<> * self, int index)

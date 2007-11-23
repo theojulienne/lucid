@@ -31,7 +31,7 @@ static void hash_test()
     for(i = 0; i < len; i++)
     {
         // THIS LINE WILL COST YOU HOURS. BE CAREFUL.
-        char * key = (char *) * (void **)lt_array_get_item(keys, i);
+        char * key = * (char **)lt_array_get_item(keys, i);
         printf("%s = %d\n", key, GPOINTER_TO_INT(lt_hashtable_lookup(hash, (void *)key)));
     }
     
@@ -66,25 +66,31 @@ static void module_test()
 */
 }
 
+static void _test_foreach(const void * value, void * user_arg)
+{
+    g_print("%s: %f [%p]\n", __FUNCTION__, * (double *)value, user_arg);
+}
+
 static void array_test()
 {
 	int i, len;
    	double x;
-    	LArray * array = lt_array_create(NULL, sizeof(double));
+    LArray * array = lt_array_create(NULL, sizeof(double));
 	LIter it;
-    	x = 1;    
-    	lt_array_append(array, &x);
-    	x = 2;
-    	lt_array_append(array, &x);
-    	x = 3;    
-    	lt_array_append(array, &x);
+
+    x = 1;    
+    lt_array_append(array, &x);
+    x = 2;
+    lt_array_append(array, &x);
+    x = 3;    
+    lt_array_append(array, &x);
 
   //  x = 4;
   //  lt_array_set_item(array, 0, &x);
 
-    	len = lt_array_count(array);
+    len = lt_array_count(array);
 
-    	printf("%d\n", len);
+   	printf("%d\n", len);
 
 	it = lt_array_get_iter(array);
 	do
@@ -97,13 +103,14 @@ static void array_test()
 
 	lt_array_reverse(array);
 
-    	for(i = 0; i < len; i++)
-        {
-		double * d = (double *)lt_array_get_item(array, i);
+    for(i = 0; i < len; i++)
+    {
+	    double * d = (double *)lt_array_get_item(array, i);
 		if(d)
 			printf("%f\n", * d);
 	}
 	
+    lt_array_foreach(array, _test_foreach, (void *)0xfeedface);
    	lt_array_destroy(array);
 }
 

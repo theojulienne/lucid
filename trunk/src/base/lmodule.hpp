@@ -12,15 +12,14 @@ class LModule: public LBase
 {
 public:
 	static LModule * Load(const char * file_name);
-    	const char * GetName();
-    	void * GetSymbol(const char * symbol_name);
-
+    static void * GetSymbolInProcess(const char * symbol_name);
+    const char * GetName();
+    void * GetSymbol(const char * symbol_name);
 protected:
-    	LModule(GModule * handle);        
-    	~LModule();   
-
+    LModule(GModule * handle);        
+    ~LModule();   
 private:
-    	GModule * m_handle;
+    GModule * m_handle;
 };
 
 inline LModule::LModule(GModule * handle): m_handle(handle)

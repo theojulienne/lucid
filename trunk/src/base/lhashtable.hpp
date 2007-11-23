@@ -5,6 +5,12 @@
 
 //THIS IS ALL POINTER-BASED..BUT YOU CAN'T RESTRICT A C++ TEMPLTE TO A REFERENCE TYPE
 
+class LHashtableInst: public LBase
+{
+public:
+    
+};
+
 class LHashtableImpl: public LBase
 {
 public:

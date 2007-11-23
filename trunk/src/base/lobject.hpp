@@ -15,32 +15,30 @@ typedef sigc::signal<void, LObject *, LEvent *> LSignal;
 class LObject: public LBase, public sigc::trackable
 {
 public:
-    	LObject();
-    	~LObject();
+    LObject();
+    ~LObject();
 
-    	//REQUIRED
-    	static bool_t RegisterEvents(LType * type);
+    //REQUIRED
+    static bool_t RegisterEvents(LType * type);
 
-    	LType * GetType();    
-    	LObject * GetParent();    
-    	LArray<LObject *> * GetChildren();
+    LType * GetType();    
+    LObject * GetParent();    
+    LArray<LObject *> * GetChildren();
 
-    	LEventID AddHandler(char * event_name, lt_object_event_func * event_func, 
-        	void * user_data, void * (* val_free_fn) (void *));
-    	bool_t RemoveHandler (LEventID event_id);
-    	LEventID FindHandler(lt_object_event_func * event_func, void * user_data);
-    
+    LEventID AddHandler(char * event_name, lt_object_event_func * event_func, 
+        void * user_data, void * (* val_free_fn) (void *));
+    bool_t RemoveHandler (LEventID event_id);
+    LEventID FindHandler(lt_object_event_func * event_func, void * user_data);
 protected:
-    	void Construct();
-    	void SendRaw(char * event_name, LEvent * args);
-
+    void Construct();
+    void EmitRaw(char * event_name, LEvent * args);
 private:
-    	void SetupEvents();
-    
-    	LType * m_type;
-    	LObject * m_parent;
-    	LArray<LObject *> * m_children;    
-    	LHashtable<char *, LSignal *> * m_events;
+    void SetupEvents();
+  
+    LType * m_type;
+    LObject * m_parent;
+    LArray<LObject *> * m_children;    
+    LHashtable<char *, LSignal *> * m_events;
 };
 
 inline LType * LObject::GetType()
@@ -50,12 +48,12 @@ inline LType * LObject::GetType()
 
 inline LObject * LObject::GetParent()
 {
-    	return this->m_parent;
+    return this->m_parent;
 }    
 
 inline LArray<LObject *> * LObject::GetChildren()
 {
-    	return this->m_children;
+    return this->m_children;
 }
 
 #endif
