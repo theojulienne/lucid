@@ -158,7 +158,7 @@ void LArray<V>::Foreach(void (* foreach_func) (V * value, void * user_arg),
 {
     g_return_if_fail(foreach_func != NULL);
     
-    for(int i = 0; this->Count(); i++)
+    for(int i = 0; i < this->Count(); i++)
         foreach_func(this->GetItem(i), user_arg);        
 }
 
