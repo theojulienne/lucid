@@ -3,16 +3,13 @@
 
 #include <lbase.hpp>
 
-#include <sigc++/sigc++.h>
-
+class LDispatchList;
 class LObject;
 class LEvent;
 
 typedef void lt_object_event_func(LObject * sender, LEvent * args, void * user_data);
 
-typedef sigc::signal<void, LObject *, LEvent *> LSignal;
-
-class LObject: public LBase, public sigc::trackable
+class LObject: public LBase
 {
 public:
     LObject();
@@ -26,7 +23,7 @@ public:
     LArray<LObject *> * GetChildren();
 
     LEventID AddHandler(char * event_name, lt_object_event_func * event_func, 
-        void * user_data, void * (* val_free_fn) (void *));
+        void * user_data, void (* val_free_fn) (void *));
     bool_t RemoveHandler (LEventID event_id);
     LEventID FindHandler(lt_object_event_func * event_func, void * user_data);
 protected:
@@ -38,7 +35,7 @@ private:
     LType * m_type;
     LObject * m_parent;
     LArray<LObject *> * m_children;    
-    LHashtable<char *, LSignal *> * m_events;
+    LHashtable<char *, LDispatchList *> * m_events;
 };
 
 inline LType * LObject::GetType()

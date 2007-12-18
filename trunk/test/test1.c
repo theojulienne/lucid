@@ -1,10 +1,5 @@
 #include <lucid-base.h>
 
-static void _test_foo(LObject * obj, LEvent * args, void * user_data)
-{
-    printf("%s(%p, %p, %p)\n", __FUNCTION__, obj, args, user_data);
-}
-
 static void hash_test()
 {
     LHashtable * hash;
@@ -150,6 +145,12 @@ static void set_test()
 	g_assert(! lt_set_contains(set, "two"));
 	
 	lt_base_unref(LT_BASE(set));
+}
+
+
+static void _test_foo(LObject * obj, LEvent * args, void * user_data)
+{
+    printf("%s(%p, %p, %p)\n", __FUNCTION__, obj, args, user_data);
 }
 
 static void object_test()

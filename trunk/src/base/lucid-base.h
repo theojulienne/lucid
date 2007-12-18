@@ -140,7 +140,7 @@ typedef void lt_object_event_func(LObject * sender, LEvent * args, void * user_d
 
 LObject * lt_object_create();
 LEventID lt_object_add_handler(LObject * self, char * event_name, 
-    lt_object_event_func * event_func, void * user_data, void * (* val_free_fn) (void *));
+    lt_object_event_func * event_func, void * user_data, void (* val_free_fn) (void *));
 bool_t lt_object_remove_handler(LObject * self, LEventID event_id);
 LEventID lt_object_find_handler(LObject * self, lt_object_event_func * event_func, void * user_data); 
 

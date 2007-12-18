@@ -1,18 +1,20 @@
 #include <lucid-base.h>
 
+#include <ldispatchlist.hpp>
+
 extern "C"
 {
 
 LEventID lt_object_add_handler(LObject * self, char * event_name, 
-	lt_object_event_func * event_func, void * user_data, void * (* val_free_fn) (void *));
+	lt_object_event_func * event_func, void * user_data, void (* val_free_fn) (void *));
 bool_t lt_object_remove_handler(LObject * self, LEventID event_id);
 LEventID lt_object_find_handler(LObject * self, lt_object_event_func * event_func, void * user_data); 
 
 }
 
-static void _lt_signal_destroy(LSignal * signal)
+static void _lt_dispatchlist_destroy(LDispatchList * list)
 {
-	delete signal;
+    LDispatchList::Destroy(list);
 }
 
 LT_DEFINE_TYPE(LObject, lt_object, NULL);
@@ -35,48 +37,42 @@ LObject::~LObject()
 
 void LObject::SetupEvents()
 {
-    this->m_events = new LHashtable<char *, LSignal *>(FALSE, _lt_signal_destroy);
+    this->m_events = new LHashtable<char *, LDispatchList *>(FALSE, _lt_dispatchlist_destroy);
 
     for(LType * type = this->m_type; type != NULL; type = type->GetParent())
     {
         LArray<char *> * events = type->GetEvents();   
         for(int i = 0, len = events->Count(); i < len; i++)
-			this->m_events->Insert(* events->GetItem(i), new LSignal());
+			this->m_events->Insert(* events->GetItem(i), NULL);
     }    
 }
 
 LEventID LObject::AddHandler(char * event_name, lt_object_event_func * event_func, 
-	void * user_data, void * (* val_free_fn) (void *))
+	void * user_data, void (* val_free_fn) (void *))
 {
-	LSignal * signal;
-    sigc::slot_base ** event_id;
+	LDispatchList * list;
+    char * orig_key;
 
     g_return_val_if_fail(event_name != NULL, 0);
     g_return_val_if_fail(event_func != NULL, 0);
-
-    signal = this->m_events->Lookup(event_name);
-
-	if(! signal)
+    
+    if(! this->m_events->LookupExtended(event_name, &orig_key, &list))
         return 0;
 
-	sigc::connection c = signal->connect(sigc::bind(sigc::ptr_fun(event_func), user_data));	
-	event_id = (sigc::slot_base **)&c;
-	
-	if(val_free_fn)    	
-		(* event_id)->add_destroy_notify_callback(user_data, val_free_fn);
-	
-	return (LEventID) * event_id;
+    list = LDispatchList::Add(list, LDelegate(event_func), user_data, val_free_fn);
+    this->m_events->Insert(orig_key, list);
+
+	return (LEventID)list;
 }
 
+//TODO- How is this going to work!?
 bool_t LObject::RemoveHandler (LEventID event_id)
 {
-    sigc::slot_base * base = (sigc::slot_base *)event_id;
+    LDispatchList * list = (LDispatchList *)event_id;
 
-    g_return_val_if_fail(base != NULL, FALSE);
-    
-	base->disconnect();
-	
-    return TRUE;
+    g_return_val_if_fail(list != NULL, FALSE);
+
+    return FALSE;
 }
 
 LEventID LObject::FindHandler(lt_object_event_func * event_func, void * user_data)
@@ -87,14 +83,13 @@ LEventID LObject::FindHandler(lt_object_event_func * event_func, void * user_dat
 
 void LObject::EmitRaw(char * event_name, LEvent * args)
 {
-	LSignal * signal = this->m_events->Lookup(event_name);
+	LDispatchList * list = this->m_events->Lookup(event_name);
 	// FIXME - SILENTLY FAIL ?
-	if(signal)
-		signal->emit(this, args);
+    LDispatchList::Invoke(list, this, args);
 }
 
 LEventID lt_object_add_handler(LObject * self, char * event_name, 
-    lt_object_event_func * event_func, void * user_data, void * (* val_free_fn) (void *))
+    lt_object_event_func * event_func, void * user_data, void (* val_free_fn) (void *))
 {
    	LT_RET_CALL_CPP(AddHandler, 0, event_name, event_func, user_data, val_free_fn);
 }
