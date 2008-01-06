@@ -1,0 +1,28 @@
+macbook:~/Development/lucid/trunk/trials/swigtest theo$ cat vtest.cpp
+#include <stdio.h>
+
+#include "vtest.hpp"
+
+void Foo::bar( int a, int b )
+{
+        printf( "Foo::bar(%d,%d) called in C++\n", a, b );
+}
+
+void baz( Foo *f, int a, int b )
+{
+        f->bar( a, b );
+}
+
+macbook:~/Development/lucid/trunk/trials/swigtest theo$ cat test.py
+import vtest
+
+class Foot(vtest.Foo):
+        def bar( self, a, b ):
+                print "Foot.bar(%s,%s) called in Python!" % (a,b)
+
+
+f = Foot( )
+vtest.baz( f, 3, 4 )
+macbook:~/Development/lucid/trunk/trials/swigtest theo$ python test.py
+Foot.bar(3,4) called in Python!
+macbook:~/Development/lucid/trunk/trials/swigtest theo$
