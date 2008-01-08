@@ -1,0 +1,10 @@
+python:
+	make -C python linux
+java:	
+	make -C java linux
+cs:	
+	make -C cs linux
+clean:
+	make -C python clean
+	make -C java clean
+	make -C cs clean	

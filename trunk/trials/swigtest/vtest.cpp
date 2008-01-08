@@ -24,6 +24,8 @@ void baz( Foo *f, int a, int b )
 // not public:
 class CFoot: public Foo
 {
+	virtual ~CFoot() { printf("%s()\n", __FUNCTION__); }
+
 	void bee( int a, int b )
 	{
 		printf( "CFoot::bee(%d,%d) called in C++\n", a, b );
