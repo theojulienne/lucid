@@ -1,8 +1,10 @@
 //import Foo;
 //import Foot;
 
-public class main {
-	static {
+public class Main
+{
+	static 
+	{
 		System.loadLibrary("vtest");
 	}
 	
@@ -13,7 +15,8 @@ public class main {
 		f.bee( a, b );
 	}
 	
-	public static void main( String argv[] ) {
+	public static void main( String argv[] ) 
+	{
 		Foot f = new Foot();
 		vtest.baz( f, 3, 4 );
 		jbaz( f, 1, 2 );

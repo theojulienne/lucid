@@ -1,0 +1,10 @@
+python:
+	make -C python darwin
+java:	
+	make -C java darwin
+cs:	
+	make -C cs darwin
+clean:
+	make -C python clean
+	make -C java clean
+	make -C cs clean	
