@@ -1,11 +1,13 @@
 all: python
 
 python:
-	swig -python -c++ vtest.i
+	cd python
+	swig -python -c++ ../vtest.i
 	c++ -c vtest_wrap.cxx -I /System/Library/Frameworks/Python.framework/Headers/
 	c++ -dynamiclib vtest.cpp vtest_wrap.o -o _vtest.so -framework Python
-
+	
 lua:
+	cd lua
 	swig -lua -c++ vtest.i
 	c++ -c vtest_wrap.cxx -I /sw/include
 	c++ -bundle vtest.cpp vtest_wrap.o -o vtest.so -llua
