@@ -21,6 +21,11 @@ namespace Embed
             h(IntPtr.Zero);
         }
 
+        public object Blick()
+        {
+            return 12;
+        }
+
         ~Foo()
         {
             Console.WriteLine("Foo.Finalize()");

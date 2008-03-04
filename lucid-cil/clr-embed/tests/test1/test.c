@@ -7,68 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-typedef struct
-{
-    MonoClass * klass;
-    gpointer obj;        
-} NObject;
-
-#define _PAD(size) ((G_MEM_ALIGN - (size % G_MEM_ALIGN)) % G_MEM_ALIGN)
-
-NObject * n_object_new(MonoObject * mono_obj)
-{
-    NObject * obj;
-    MonoClass * klass;
-    gpointer val;
-    int size;
-
-    g_return_val_if_fail(mono_obj != NULL, NULL);
-    
-    klass = mono_object_get_class(mono_obj);
-    g_return_val_if_fail(klass != NULL, NULL);
-
-    if(mono_class_is_valuetype(klass))
-    {
-        size = mono_class_value_size (klass, NULL);
-        obj = g_slice_alloc(sizeof(NObject) + _PAD(size));
-        val = mono_object_unbox(mono_obj);
-        mono_value_copy((gpointer)&obj->obj, val, klass);
-    }
-    else
-    {
-        obj = g_slice_new(NObject);
-        obj->obj = GINT_TO_POINTER(_gchandle_get(mono_obj));
-    }
-    obj->klass = klass;
-    return obj;
-}
-
-// G_MEM_ALIGN
-void n_object_free(NObject * obj)
-{
-    int size = 0;
-
-    g_return_if_fail(obj != NULL && obj->klass != NULL);
-    
-    if(! mono_class_is_valuetype(obj->klass))
-        _gchandle_free(GPOINTER_TO_INT(obj->obj));    
-    else
-        size = mono_class_value_size(obj->klass, NULL);
-
-    size += sizeof(NObject) + _PAD(size);
-    memset(obj, 0, size); 
-    g_slice_free1(size, obj); 
-}
-
-gboolean n_object_get_int32(NObject * obj, gint32 * val)
-{
-    g_return_val_if_fail(obj != NULL && obj->klass != NULL, FALSE);
-    g_return_val_if_fail(obj->klass == mono_get_int32_class(), FALSE);    
-
-    * val = (* (gint32 *)&obj->obj);
-
-    return TRUE;
-}
+#include "nobject.h"
 
 // Internal API
 MonoDelegate * ftnptr_to_delegate (MonoDomain * domain, MonoClass * klass, gpointer ftn)
@@ -115,9 +54,10 @@ MonoDelegate * ftnptr_to_delegate (MonoDomain * domain, MonoClass * klass, gpoin
 #define FOO_METH_CTOR 0
 #define FOO_METH_CCTOR 1
 #define FOO_METH_BAR 2
-#define FOO_METH_FINALIZE 3
-#define FOO_METH_QUUX 4
-#define FOO_METH_LAST 5
+#define FOO_METH_BLICK 3
+#define FOO_METH_FINALIZE 4
+#define FOO_METH_QUUX 5
+#define FOO_METH_LAST 6
 static MonoMethod * Embed_Foo_methods[FOO_METH_LAST];
 
 static void cache_methods(MonoClass * klass, MonoMethod ** methods)
@@ -133,7 +73,9 @@ static void cache_methods(MonoClass * klass, MonoMethod ** methods)
 
 // Calls Foo.Bar() with a delegate 
 
-void Embed_Foo_Bar(MonoObject * obj, MonoDelegate * del)
+/*
+
+void Embed_Foo_Bar(NObject * obj, MonoDelegate * del)
 {
     gpointer args[1];
     args[0] = del;
@@ -149,7 +91,7 @@ void Embed_Foo_Bar(MonoObject * obj, MonoDelegate * del)
 
 // Calls Foo.Quux() with a function pointer
 
-void Embed_Foo_Quux(MonoObject * obj, void * ftn_ptr)
+void Embed_Foo_Quux(NObject * obj, void * ftn_ptr)
 {
     gpointer args[1];
     args[0] = &ftn_ptr;
@@ -163,9 +105,46 @@ void Embed_Foo_Quux(MonoObject * obj, void * ftn_ptr)
         mono_unhandled_exception(exc);
 }
 
+*/
+
+NObject * Embed_Foo_Blick(NObject * obj)
+{
+    MonoObject * exc = NULL, * ret, * this;
+   
+    g_return_val_if_fail(obj != NULL, NULL);
+
+    this = mono_gchandle_get_target(GPOINTER_TO_INT(obj->obj));
+    g_return_val_if_fail(this != NULL, NULL);
+
+    ret = mono_runtime_invoke(Embed_Foo_methods[FOO_METH_BLICK], (void *)obj, NULL, &exc);
+
+    if(exc)
+    {
+        mono_unhandled_exception(exc);
+        return NULL;
+    }
+    else
+        return n_object_new_ref(ret);
+}
+
 static void _bar_cb(guint32 handle)
 {
     g_print("_bar_cb(%d)\n", handle);
+}
+
+static void call_nobject(MonoObject * mono_obj)
+{
+    NObject * n_obj, * ret;
+    int val;
+
+    n_obj = n_object_new_ref(mono_obj);
+    ret = Embed_Foo_Blick(n_obj);
+
+    n_object_get_int32(ret, &val);
+    g_print("%s: %d\n", __FUNCTION__, val);
+    n_object_unref(ret);
+
+    n_object_unref(n_obj);  
 }
 
 static void do_test(MonoDomain *domain, MonoImage *image)
@@ -197,11 +176,11 @@ static void do_test(MonoDomain *domain, MonoImage *image)
     MonoDelegate * del = ftnptr_to_delegate(domain, del_class, (gpointer)_bar_cb);
     g_assert(del != NULL);
 
-    // ** WORKS **
-    Embed_Foo_Bar(obj, del);
+   // Embed_Foo_Bar(obj, del);
 
-    // ** FAILS HARD **
-    Embed_Foo_Quux(obj, _bar_cb);
+   // Embed_Foo_Quux(obj, _bar_cb);
+    
+   call_nobject(obj);
 }
 
 static void main_function (MonoDomain *domain, const char *file, int argc, char **argv)
@@ -249,8 +228,9 @@ int main (int argc, char * argv[])
 	main_function (domain, file, argc - 1, argv + 1);
 
 	retval = mono_environment_exitcode_get ();
-	
-	mono_jit_cleanup (domain);
+    _gchandle_destroy();
+	mono_jit_cleanup (domain);    
+
 	return retval;
 }
 
