@@ -1,0 +1,47 @@
+info
+	name "Lucid"
+	description "lucid"
+	version "0.1"
+
+targets
+	application test
+		sources
+			src/test.d
+			
+			src/lucid/all.d
+			src/lucid/application.d
+			src/lucid/types.d
+			src/lucid/events.d
+			src/lucid/event_object.d
+			src/lucid/base_object.d
+			src/lucid/member_object.d
+			
+			src/lucid/foo_object.d
+			
+			src/pyd/lib_abstract.d
+
+contains
+	none
+
+options
+	none
+
+depends
+	platform win32
+		none
+	platform darwin
+		none
+	platform posix
+		none
+	platform all
+		none
+
+flags
+	platform darwin
+		library "iconv"
+		library "lucid-native-cocoa"
+		ldflags "-Lsrc/lucid/native/cocoa"
+	
+	cflags "-Isrc/"
+	
+	cflags "-g"

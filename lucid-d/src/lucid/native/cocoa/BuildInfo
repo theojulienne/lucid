@@ -1,0 +1,35 @@
+info
+	name "Lucid Cocoa Native"
+	description "lucid-cocoa-native"
+	version "0.1"
+
+targets
+	library lucid-native-cocoa
+		sources
+			application.m
+
+contains
+	none
+
+options
+	none
+
+depends
+	platform win32
+		none
+	platform darwin
+		none
+	platform posix
+		none
+	platform all
+		none
+
+flags
+	platform darwin
+		library "iconv"
+	
+	ldflags "-framework Cocoa"
+	
+	cflags "-Isrc/"
+	
+	cflags "-g"
