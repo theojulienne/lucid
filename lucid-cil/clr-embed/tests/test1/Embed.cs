@@ -23,7 +23,7 @@ namespace Embed
 
         public object Blick()
         {
-            return 12;
+            return new int[] { 12 };
         }
 
         ~Foo()

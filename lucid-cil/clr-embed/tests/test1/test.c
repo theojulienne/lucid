@@ -7,19 +7,17 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "nobject.h"
-
 // Internal API
 MonoDelegate * ftnptr_to_delegate (MonoDomain * domain, MonoClass * klass, gpointer ftn)
 {
     static MonoMethod * _mono_method = NULL;
     gpointer args[2];
     MonoObject * exc = NULL, * ret, * type;
-    
+
     if(_mono_method == NULL)
-    {    
+    {
         g_print("%s: %p\n", __FUNCTION__, mono_get_corlib());
-        MonoClass * _marshal_klass = mono_class_from_name (mono_get_corlib(), 
+        MonoClass * _marshal_klass = mono_class_from_name (mono_get_corlib(),
             "System.Runtime.InteropServices", "Marshal");
         g_assert(_marshal_klass != NULL);
 
@@ -27,19 +25,19 @@ MonoDelegate * ftnptr_to_delegate (MonoDomain * domain, MonoClass * klass, gpoin
             ":GetDelegateForFunctionPointer", FALSE);
         _mono_method = mono_method_desc_search_in_class(_mdesc, _marshal_klass);
         mono_method_desc_free(_mdesc);
-        
+
         g_assert(_mono_method != NULL);
     }
-    
+
     g_assert(klass != NULL && ftn != NULL);
 
     type = (MonoObject*)mono_type_get_object(domain, mono_class_get_type(klass));
     g_assert(type != NULL);
-    
+
     args[0] = &ftn;
     args[1] = type;
-   
-    ret = mono_runtime_invoke(_mono_method, NULL, args, &exc);    
+
+    ret = mono_runtime_invoke(_mono_method, NULL, args, &exc);
 
     if(exc)
     {
@@ -71,7 +69,7 @@ static void cache_methods(MonoClass * klass, MonoMethod ** methods)
         i++;
 }
 
-// Calls Foo.Bar() with a delegate 
+// Calls Foo.Bar() with a delegate
 
 /*
 
@@ -80,11 +78,11 @@ void Embed_Foo_Bar(NObject * obj, MonoDelegate * del)
     gpointer args[1];
     args[0] = del;
     MonoObject * exc = NULL;
-    
+
     g_assert(obj != NULL && del != NULL);
 
-    mono_runtime_invoke(Embed_Foo_methods[FOO_METH_BAR], (void *)obj, args, &exc);    
-    
+    mono_runtime_invoke(Embed_Foo_methods[FOO_METH_BAR], (void *)obj, args, &exc);
+
     if(exc)
         mono_unhandled_exception(exc);
 }
@@ -96,7 +94,7 @@ void Embed_Foo_Quux(NObject * obj, void * ftn_ptr)
     gpointer args[1];
     args[0] = &ftn_ptr;
     MonoObject * exc = NULL;
-   
+
     g_assert(obj != NULL && ftn_ptr != 0);
 
     mono_runtime_invoke(Embed_Foo_methods[FOO_METH_QUUX], (void *)obj, args, &exc);
@@ -107,14 +105,11 @@ void Embed_Foo_Quux(NObject * obj, void * ftn_ptr)
 
 */
 
-NObject * Embed_Foo_Blick(NObject * obj)
+MonoObject * Embed_Foo_Blick(MonoObject * obj)
 {
-    MonoObject * exc = NULL, * ret, * this;
-   
-    g_return_val_if_fail(obj != NULL, NULL);
+    MonoObject * exc = NULL, * ret;
 
-    this = mono_gchandle_get_target(GPOINTER_TO_INT(obj->obj));
-    g_return_val_if_fail(this != NULL, NULL);
+    g_return_val_if_fail(obj != NULL, NULL);
 
     ret = mono_runtime_invoke(Embed_Foo_methods[FOO_METH_BLICK], (void *)obj, NULL, &exc);
 
@@ -124,7 +119,7 @@ NObject * Embed_Foo_Blick(NObject * obj)
         return NULL;
     }
     else
-        return n_object_new_ref(ret);
+        return ret;
 }
 
 static void _bar_cb(guint32 handle)
@@ -134,17 +129,14 @@ static void _bar_cb(guint32 handle)
 
 static void call_nobject(MonoObject * mono_obj)
 {
-    NObject * n_obj, * ret;
-    int val;
+    MonoObject * ret;
 
-    n_obj = n_object_new_ref(mono_obj);
-    ret = Embed_Foo_Blick(n_obj);
+    ret = Embed_Foo_Blick(mono_obj);
 
-    n_object_get_int32(ret, &val);
-    g_print("%s: %d\n", __FUNCTION__, val);
-    n_object_unref(ret);
+    g_print("%s: %d ", __FUNCTION__, mono_array_get((MonoArray *)ret, int, 0));
 
-    n_object_unref(n_obj);  
+    int type = mono_type_get_type(mono_class_get_type(mono_object_get_class(ret)));
+    g_print("[0x%x]\n", type);
 }
 
 static void do_test(MonoDomain *domain, MonoImage *image)
@@ -153,7 +145,7 @@ static void do_test(MonoDomain *domain, MonoImage *image)
 	MonoObject *obj;
 
 	klass = mono_class_from_name (image, "Embed", "Foo");
-	if (!klass) 
+	if (!klass)
     {
 		fprintf (stderr, "Can't find Foo in assembly %s\n", mono_image_get_filename (image));
 		exit (1);
@@ -179,7 +171,7 @@ static void do_test(MonoDomain *domain, MonoImage *image)
    // Embed_Foo_Bar(obj, del);
 
    // Embed_Foo_Quux(obj, _bar_cb);
-    
+
    call_nobject(obj);
 }
 
@@ -199,12 +191,12 @@ static void main_function (MonoDomain *domain, const char *file, int argc, char 
     do_test(domain, mono_assembly_get_image (assembly));
 }
 
-int main (int argc, char * argv[]) 
+int main (int argc, char * argv[])
 {
 	MonoDomain *domain;
 	const char *file;
 	int retval;
-	
+
 	if (argc < 2)
     {
 		fprintf (stderr, "Please provide an assembly to load\n");
@@ -217,19 +209,18 @@ int main (int argc, char * argv[])
 	 * mono_jit_init() creates a domain: each assembly is
 	 * loaded and run in a MonoDomain.
 	 */
-    //NOTE: Uses the assembly's reference to corlib to determine runtime version. 
+    //NOTE: Uses the assembly's reference to corlib to determine runtime version.
     // We only support v2.0, so we use mono_jit_init_version() instead..
 	//domain = mono_jit_init(/*file*/"lucid-appdomain");
-    
+
     domain = mono_jit_init_version("clr", "v2.0.50727");
-    
+
     g_print("%s()\n", __FUNCTION__);
 
 	main_function (domain, file, argc - 1, argv + 1);
 
 	retval = mono_environment_exitcode_get ();
-    _gchandle_destroy();
-	mono_jit_cleanup (domain);    
+	mono_jit_cleanup (domain);
 
 	return retval;
 }
