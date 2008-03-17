@@ -4,6 +4,15 @@
 class _TypeRecord(object):
     __slots__ = ("parent", "children", "event_table", "event_count")
 
+
+def _last_evt_idx(cls):
+    index = 0
+    parent = cls._ltype.parent
+    while parent is not None:
+        index += parent.event_count
+        parent = parent._ltype.parent
+    return index    
+
 #Does this even need to be public?
 class LucidType(type):
 
@@ -22,11 +31,11 @@ class LucidType(type):
                 evts = cls.__events__
             except AttributeError:
                 pass
-            for evt in evts:
-                # add event 
+            for evt in evts:                
                 pass
     
         super(LucidType, cls).__init__(name, bases, dct)
+
 
 class _EventTable(dict):    
     __slots__ = ("_table", )
@@ -38,7 +47,9 @@ class _EventTable(dict):
         if self.get(name):
             raise KeyError("Event name '%s' already exists" % (name, ))
         self._table.append(name)
-        self[name] = len(self._table) - 1
+        index = len(self._table) - 1
+        self[name] = index
+        return index
 
     def get_index(self, name):
         try:
@@ -51,6 +62,7 @@ class _EventTable(dict):
             return self._table[index]        
         except IndexError:
             raise KeyError("Event index '%d' doesn't exist" % (index, ))
+
 
 class Object(object):
     __metaclass__ = LucidType
