@@ -1,7 +1,8 @@
 import _enum
 
-# Hack so that our enum values are explicitly convertible to integers.
+__all__ = ("Enum", )
 
+# Hack so that our enum values are explicitly convertible to integers.
 class IntEnumValue(_enum.EnumValue):
     def __int__(self):
         return self.index

@@ -1,6 +1,16 @@
+import logging, sys
+
 from threading import ThreadObject
 import slist
-    
+
+__all__ = ("Object", )
+
+# HACK HACK HACK
+def _log(s):
+    # I really want to display <module>.<function name>
+    co = sys._getframe(1).f_code
+    print "dbg: %s" % (s, )
+       
 #metatype needs: parent, list of child types, event table, event count
 #FIXME: What is the optimum number of slots before going to a dict? eight? 
 # Though slots provides us some more static behavior.
@@ -46,7 +56,7 @@ class LucidType(type):
         # This is NOT safe (but base.Object doesn't exist yet..)      
         if ThreadObject not in bases:
             rec.parent = _parent_rec(rec)
-            print "making %s [%s]" % (name, rec.parent.pytype)
+            _log("making %s [%s]" % (name, rec.parent.pytype))
             if not rec.parent.children:
                 rec.parent.children = []
             rec.parent.children.append(rec)      
@@ -57,14 +67,14 @@ class LucidType(type):
         evts = cls.__dict__.get("__levents__", ())
         if len(evts) > 0:
             if len(rec.parent.children) > 1:
-                print "splitting %s" % (name, )
+                _log("splitting %s" % (name, ))
                 _split_rec(rec)    
             for evt in evts:
                 index = _add_evt(rec, evt)
                 setattr(cls, evt[0], index)
-        print "%s defines %d events [%x, %d]" % (name, len(evts), id(rec.event_table), len(rec.event_table))        
+        _log("%s defines %d events [%x, %d]" % (name, len(evts), id(rec.event_table), len(rec.event_table)))        
         for n in rec.event_table:
-            print "\t%s" % (n, )
+            _log("\t%s" % (n, ))
         super(LucidType, cls).__init__(name, bases, dct)
 
 
@@ -80,7 +90,7 @@ class _EventTable(dict):
         self._table.append(name)
         index = len(self._table) - 1
         self[name] = index
-        print "_EventTable.add(): %s : %d" % (name, index)
+        _log("_EventTable.add(): %s : %d" % (name, index))
         return index
 
     def get_index(self, name):

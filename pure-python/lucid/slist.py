@@ -1,3 +1,6 @@
+# Simple slingly-linked list implementation
+
+__all__ = ("prepend", "remove")
 
 class Node(object):
     __slots__ = ("data", "next")

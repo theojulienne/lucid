@@ -1,5 +1,5 @@
-from lucid.base import _EventTable, Object
-from lucid.ifaces import IEventLoop, WatchEvents
+import lucid
+from lucid.base import Object
 
 class Foo(Object):
     __levents__ = (("mooed", None), )
