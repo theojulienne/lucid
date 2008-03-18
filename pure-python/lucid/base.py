@@ -1,3 +1,4 @@
+from threading import ThreadObject
 import slist
     
 #metatype needs: parent, list of child types, event table, event count
@@ -43,7 +44,7 @@ class LucidType(type):
         rec.parent = None
                  
         # This is NOT safe (but base.Object doesn't exist yet..)      
-        if object not in bases:
+        if ThreadObject not in bases:
             rec.parent = _parent_rec(rec)
             print "making %s [%s]" % (name, rec.parent.pytype)
             if not rec.parent.children:
@@ -95,7 +96,7 @@ class _EventTable(dict):
             raise KeyError("Event index '%d' doesn't exist" % (index, ))
 
 
-class Object(object):
+class Object(ThreadObject):
     __metaclass__ = LucidType
 
     def __init__(self, parent = None):
@@ -103,7 +104,7 @@ class Object(object):
         self._events = [None for i in xrange(count)]
         self._parent = parent
         self._children = None
-    
+        
     # Events    
     def add_handler(self, index, func):
         try:

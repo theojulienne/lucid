@@ -29,7 +29,8 @@ def main():
     o.emit("blicked", o, "blicked")
     
     o.add_child(Foo())
-    o.foreach_children(blick, "foreach_chilren")
+    o.add_child(Foo())
+    o.foreach_children(blick, "foreach_children")
     
 if __name__ == "__main__":
     main()
