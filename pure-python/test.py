@@ -1,4 +1,5 @@
 from lucid.base import _EventTable, Object
+from lucid.ifaces import IEventLoop, WatchEvents
 
 class Foo(Object):
     __levents__ = (("mooed", None), )
@@ -31,7 +32,7 @@ def main():
     o.add_child(Foo())
     o.add_child(Foo())
     o.foreach_children(blick, "foreach_children")
-    
+        
 if __name__ == "__main__":
     main()
 
