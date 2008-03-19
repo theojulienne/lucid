@@ -1,7 +1,7 @@
 import lucid
-from lucid.base import Object
+from lucid import base, io
 
-class Foo(Object):
+class Foo(base.Object):
     __levents__ = (("mooed", None), )
 
     # less annoying formatting
@@ -17,7 +17,7 @@ class Bar(Foo):
 def blick(sender, evt_name):
     print "blick(%s, %s)" % (sender, evt_name)
 
-def main():
+def lobject_test():
     o = Bar()
     
     o.add_handler("mooed", blick)
@@ -32,7 +32,19 @@ def main():
     o.add_child(Foo())
     o.add_child(Foo())
     o.foreach_children(blick, "foreach_children")
-        
+
+def loop_test():
+    print io.get_loop()
+     
+
+def do_test(f):
+    print "\n%s:\n" % (f.__name__, )
+    f()
+
+def main():
+    do_test(lobject_test)
+    do_test(loop_test)
+   
 if __name__ == "__main__":
     main()
 

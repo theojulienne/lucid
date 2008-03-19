@@ -3,6 +3,8 @@ from enum import Enum
 
 __all__ = ("WatchEventKind", "HandleKind", "WatchEvent", "IEventLoop")
 
+### Interfaces
+
 #FIXME: This actually needs to be some kind of 'bitflags' object..
 WatchEventKind = Enum("None", "In", "Out", "Err", "Hup")
 HandleKind = Enum("Invalid", "FD")
@@ -30,11 +32,11 @@ class WatchEvent(object):
             
 class IEventLoop(Interface):
     
-    def add_watch(handle, events, handler): pass
+    def add_watch(handle, events, handler, args): pass
     
     def update_watch(source, events): pass
 
-    def add_timeout(timeout, handler): pass
+    def add_timeout(timeout, handler, args): pass
 
     def remove_source(source): pass
 
@@ -46,4 +48,11 @@ class IEventLoop(Interface):
 
     def has_pending(): pass
 
+
+### Implementation Loading
+
+try:
+    from glib_impl import get_loop
+except ImportError, ex:
+    raise ex
 
