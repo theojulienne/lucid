@@ -1,12 +1,12 @@
 from zope.interface import Interface, implements
-from enum import Enum
+from enum import Enum, Flags
 
 __all__ = ("WatchEventKind", "HandleKind", "WatchEvent", "IEventLoop")
 
 ### Interfaces
 
 #FIXME: This actually needs to be some kind of 'bitflags' object..
-WatchEventKind = Enum("None", "In", "Out", "Err", "Hup")
+WatchEventKind = Flags("None", "In", "Out", "Err", "Hup")
 HandleKind = Enum("Invalid", "FD")
 
 class OSHandle(object):

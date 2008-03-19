@@ -14,6 +14,19 @@ class GSource(object):
         self._id = id
 
 
+def _make_cond(events):
+    cond = 0
+    if WatchEventKind.In & events:
+        cond |= gobject.IO_IN
+    if WatchEventKind.Out & events:
+        cond |= gobject.IO_OUT    
+    if WatchEventKind.Err & events:
+        cond |= gobject.IO_ERR
+    if WatchEventKind.Hup & events:
+        cond |= gobject.IO_HUP
+    return cond
+    
+            
 class GMainLoop(object):
     implements(IEventLoop)
     __slots__ = ("_loop", )
@@ -24,7 +37,7 @@ class GMainLoop(object):
     
     def add_watch(handle, events, handler, args):
         assert handle.kind == HandleKind.FD
-        cond = gobject.IO_IN        
+        cond = _make_cond(events)     
         id = gobject.io_add_watch(int(handle), cond, handler, *args)
         return GSource(id)
 

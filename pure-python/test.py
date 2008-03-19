@@ -17,6 +17,10 @@ class Bar(Foo):
 def blick(sender, evt_name):
     print "blick(%s, %s)" % (sender, evt_name)
 
+def enum_test():
+    x = io.WatchEventKind.In | io.WatchEventKind.Out
+    print io.WatchEventKind.In & x
+
 def lobject_test():
     o = Bar()
     
@@ -42,6 +46,7 @@ def do_test(f):
     f()
 
 def main():
+    do_test(enum_test)
     do_test(lobject_test)
     do_test(loop_test)
    
