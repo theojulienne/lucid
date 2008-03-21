@@ -40,15 +40,15 @@ abstract class EventObject(BaseObject):
         except:
             raise
                   
-    def Emit(event_name, *args):
+    protected def Emit(event_name, *args):
         index = TypeManager.GetRecord(GetType()).GetEventIndex(event_name)
         self.EmitRaw(index, args)      
             
-    def protected Emit(index, *args):
+    protected def Emit(index as int, *args):
         self.EmitRaw(index, args)
 
     private def EmitRaw(index, *args):
         d = self.events[index]
-        if is not null:
+        if d is not null:
             d.DynamicInvoke(args)
 

@@ -6,9 +6,9 @@ import System.Threading
 #FIXME: static classes in Boo?
 abstract class Global:
 
-    private static main as Thread = null
+    static private main as Thread = null
 
-    public static Thread MainThread:
+    static public MainThread as Thread:
         internal set:
             main = value
         get:

@@ -1,2 +1,2 @@
 all:
-	gmcs *.cs -t:library -out:Lucid.dll
+	booc *.boo -t:library -out:Lucid.dll

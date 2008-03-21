@@ -1,68 +1,46 @@
-using System;
-using System.Reflection;
-using System.Threading;
-
 namespace Lucid
-{
-    public static class Application
-    {
-        public static void Init(string[] args)
-        {
-            Global.MainThread = Thread.CurrentThread;
-            Native.Load();
-        }
-        
-        public static void Init()
-        {
-            Init(null);
-        }
 
-        public static bool Debug = false;
+import System
+import System.Reflection
+import System.Threading
 
-        public static void WriteDebug(string message, params object[] args)
-        {
-            if(! Debug)
-                return;
 
-            Native.Factory.GetLogger().WriteDebug(message, args);
-        }
+public abstract class Application:
 
-        public static void WriteWarning(string message, params object[] args)
-        {
-            if(! Debug)
-                return;
+    static def Init(args as (string)):
+        Global.MainThread = Thread.CurrentThread
+        Native.Load()
             
-            Native.Factory.GetLogger().WriteWarning(message, args);
-        }
+    static def Init():
+        Init(null)
 
-        public static void Run()
-        {
-            Native.Factory.GetLoop().Run();
-        }
+    static public Debug = false
 
-        public static void Quit(bool done)
-        {
-            IEventLoop loop = Native.Factory.GetLoop();
-            loop.Quit();
+    static def WriteDebug(message, *args):
+        if Debug:
+            Native.Factory.GetLogger().WriteDebug(message, args)
 
-            if(done)
-                (loop as IDisposable).Dispose();
-        }
+    static def WriteWarning(message, *args):
+        if Debug:
+            Native.Factory.GetLogger().WriteWarning(message, args)
 
-        public static void Quit()
-        {
-            Quit(true);
-        }
+    static def Run():
+        Native.Factory.GetLoop().Run()
 
-        public static object AddWatch(OSHandle handle, WatchEventKind events, 
-            WatchHandler handler)
-        {
-            return Native.Factory.GetLoop().AddWatch(handle, events, handler);
-        }
+    static def Quit(done as bool):
+        loop = Native.Factory.GetLoop()
+        loop.Quit()
+        //FIXME: This should happen auto-magically per-thread
+        if done:
+            loop.Dispose()
 
-        public static object AddTimeout(uint timeout, TimeoutHandler handler)
-        {
-            return Native.Factory.GetLoop().AddTimeout(timeout, handler);          
-        }   
-    }
-}
+    static def Quit():
+        Quit(true)
+
+    static def AddWatch(handle as OSHandle, events as WatchEventKind, handler as WatchHandler) as object: 
+        return Native.Factory.GetLoop().AddWatch(handle, events, handler)
+
+    static def AddTimeout(timeout as uint, handler as TimeoutHandler) as object:
+        return Native.Factory.GetLoop().AddTimeout(timeout, handler)
+                
+

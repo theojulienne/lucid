@@ -3,6 +3,7 @@ namespace Lucid
 import System
 import System.Runtime.InteropServices
 
+
 [StructLayout (LayoutKind.Sequential)]
 class OSHandle(ValueType):
     
@@ -20,6 +21,7 @@ class OSHandle(ValueType):
     override def ToString() as string:
         return String.Format("{0:x2} [{1}]", Handle, HandleKind)
 
+    //TODO
       /*  public static implicit operator IntPtr(OSHandle handle)
         {
             return handle.Handle;

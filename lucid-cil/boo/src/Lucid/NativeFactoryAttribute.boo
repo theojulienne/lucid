@@ -2,6 +2,7 @@ namespace Lucid
 
 import System
 
+
 [AttributeUsage(AttributeTargets.Assembly)]
 class NativeFactoryAttribute(Attribute):
 
@@ -10,6 +11,6 @@ class NativeFactoryAttribute(Attribute):
     def constructor(type):
         self.type = type
         
-    property Type as Type:
+    Type as Type:
         get:
             return self.type

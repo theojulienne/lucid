@@ -3,8 +3,7 @@ namespace Lucid
 import System
 
 [Flags]
-enum HandleKind
-{
+enum HandleKind:
     FD = 0
-}
+    
   

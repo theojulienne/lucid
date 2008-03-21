@@ -6,31 +6,42 @@ import System.Collections.Generic
 import System.Collections.ObjectModel
 import System.Reflection
 
+
 class Object(EventObject):
 
-    parentas as Lucid.Object = null
-    //FIXME: This will actually be a custom linked-list that handles parent/child semantics.
-    children as List of Lucid.Object = List of Lucid.Object()
+    parent as Lucid.Object = null
+    //FIXME: This will be a custom singly linked-list that handles parent/child semantics.
+    children as LinkedList of Lucid.Object = LinkedList of Lucid.Object()
     disposed as bool = false
 
     def constructor():
-        pass
+        self(null)
  
     def constructor(parent as Lucid.Object):
         self.parent = parent
-        
+       
     //FIXME
-    virtual def Dispose():
-        if self.diposed:
+    /*virtual def Dispose():
+        if self.disposed:
             return           
         GC.SuppressFinalize(self)            
         self.disposed = true
+    */
+    
+    def Reparent(new_parent as Lucid.Object):
+        raise NotImplementedException()
        
-    property Parent as Lucid.Object:
+    Parent as Lucid.Object:
         get:
             return self.parent
 
-    property Children as List of Lucid.Object:
-        get:
-            return self.children
-
+    def AddChild(child as Lucid.Object):
+        assert child is not null
+        self.children.AddFirst(child)
+    
+    def RemoveChild(child as Lucid.Object):
+        assert self.children.Remove(child)
+        
+    def IterChildren() as IEnumerator of Lucid.Object:
+        return self.children.GetEnumerator()
+                 

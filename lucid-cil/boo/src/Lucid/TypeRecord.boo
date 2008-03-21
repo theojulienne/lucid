@@ -1,70 +1,41 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Reflection;
-
 namespace Lucid
-{
-    using EventTable = KeyedValuePairCollection<string, int>;
 
-    internal class KeyedValuePairCollection<TKey, TValue> : KeyedCollection<TKey, KeyValuePair<TKey, TValue>>
-    {
-        /// <summary>
-        /// When implemented in a derived class, extracts the key from the specified element.
-        /// </summary>
-        /// <param name="item">The element from which to extract the key.</param>
-        /// <returns>The key for the specified element.</returns>
-        protected override TKey GetKeyForItem(KeyValuePair<TKey, TValue> item)
-        {
-            return item.Key;
-        }
-    }
-     
-    internal class TypeRecord
-    {
-        public TypeRecord(): this(new EventTable())
-        {
-        }
+import System
+import System.Collections
+import System.Collections.Generic
+import System.Collections.ObjectModel
+import System.Reflection
 
-        public TypeRecord(EventTable table)
-        {
-            Events = table;
-        }
 
-        public int GetEventIndex(string name)
-        {
-            try
-            {
-                return Events[name].Value;
-            }
-            catch(KeyNotFoundException e)
-            {
-                throw e;
-            }
-        }
+internal class EventTable(KeyedCollection[of string, KeyValuePair[of string, int]]):
+    protected override def GetKeyForItem(item as KeyValuePair[of string, int]) as string:
+        return item.Key
+                 
+internal class TypeRecord:
+    def constructor():
+        self(EventTable())
 
-        public string GetEventName(int index)
-        {
-            if(Events.Count > index + 1)
-                throw new ArgumentOutOfRangeException("index");
-
-            try
-            {            
-                return Events[index].Key;
-            }
-            catch(ArgumentOutOfRangeException e)
-            {
-                throw e;
-            }
-        }
+    def constructor(table):
+        self.Events = table
         
-        public Type CLRType;
-        public TypeRecord ParentType;
-        //TODO: Redo as a linked list (?)
-        public List<TypeRecord> ChildTypes;
-        public EventTable Events;
-        public int TypeEventCount;        
-    }
-}
+    def GetEventIndex(name as string) as int:
+        try:
+            return self.Events[name].Value
+        except ex as KeyNotFoundException:
+            raise
+
+    def GetEventName(index as int) as string:
+        if self.Events.Count > index + 1:
+            raise ArgumentOutOfRangeException("index")
+        try:        
+            return Events[index].Key
+        except ex as ArgumentOutOfRangeException:
+            raise
+            
+    public CLRType as Type 
+    public ParentType as TypeRecord 
+    //TODO: Redo as a smart linked list
+    public ChildTypes as List of TypeRecord
+    public Events as EventTable
+    public TypeEventCount as int   
 
