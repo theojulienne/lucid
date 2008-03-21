@@ -1,54 +1,36 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Reflection;
-
 namespace Lucid
-{
-    public class Object: EventObject
-    {
-        private Lucid.Object m_parent = null;
-        //FIXME: This will actually be a custom class to handle parent/child semantics.
-		private List<Lucid.Object> m_children = null;
-        private bool m_disposed = false;
 
-        public Object()
-        {
-        }
+import System
+import System.Collections
+import System.Collections.Generic
+import System.Collections.ObjectModel
+import System.Reflection
+
+class Object(EventObject):
+
+    parentas as Lucid.Object = null
+    //FIXME: This will actually be a custom linked-list that handles parent/child semantics.
+    children as List of Lucid.Object = List of Lucid.Object()
+    disposed as bool = false
+
+    def constructor():
+        pass
  
-        public Object(Lucid.Object parent): this()
-		{
-			m_parent = parent;
-		}
-     
-        //FIXME
-        public virtual void Dispose()
-        {
-            if(m_disposed)
-                return;
-            
-            GC.SuppressFinalize(this);            
-            m_disposed = true;
-        }
+    def constructor(parent as Lucid.Object):
+        self.parent = parent
+        
+    //FIXME
+    virtual def Dispose():
+        if self.diposed:
+            return           
+        GC.SuppressFinalize(self)            
+        self.disposed = true
        
-		public Lucid.Object Parent
-		{
-			get
-			{
-				return m_parent;
-			}
-		}
+    property Parent as Lucid.Object:
+        get:
+            return self.parent
 
-		public IList Children
-		{
-			get
-			{
-				if(m_children == null)
-					m_children = new List<Lucid.Object>();
-				return (m_children as IList);
-			}
-		}	
-    }
-}
+    property Children as List of Lucid.Object:
+        get:
+            return self.children
 

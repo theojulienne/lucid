@@ -1,22 +1,15 @@
-using System;
-using System.Threading;
-
 namespace Lucid
-{
-	public static class Global
-	{
-        private static Thread main = null;
 
-        public static Thread MainThread
-        {
-            internal set
-            {
-                main = value;
-            }
-            get
-            {
-                return main;
-            }
-        }
-	}
-}
+import System
+import System.Threading
+
+#FIXME: static classes in Boo?
+abstract class Global:
+
+    private static main as Thread = null
+
+    public static Thread MainThread:
+        internal set:
+            main = value
+        get:
+            return main

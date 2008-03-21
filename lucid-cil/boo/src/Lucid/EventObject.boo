@@ -9,64 +9,46 @@ import System.Reflection
 
 abstract class EventObject(BaseObject):
 
-    private m_events as (Delegate)
+    private events as (Delegate) = null
         
     def constructor():
         count = self.TypeRecord.Events.Count
         if count > 0:
-            m_events = array(Delegate, count)
-        else:
-            m_events = null
-            
-    def AddHandler(event_name, handler)
+            self.events = array(Delegate, count)
+
+    def AddHandler(event_name, handler):
         index = TypeManager.GetRecord(self.GetType()).GetEventIndex(event_name)  
         self.AddHandler(index, handler)
 
-    def RemoveHandler(event_name, handler)
+    def RemoveHandler(event_name, handler):
         index = TypeManager.GetRecord(self.GetType()).GetEventIndex(event_name)  
         self.RemoveHandler(index, handler)
 
-    protected def AddHandler(index as int, handler)
+    protected def AddHandler(index as int, handler):
         try:
-            d = m_events[index]
+            d = self.events[index]
             d = Delegate.Combine(d, handler)
-            m_events[index] = d         
+            self.events[index] = d         
         except:
             raise
+
+    protected def RemoveHandler(index as int, handler):
+        try:
+            d = self.events[index]
+            d = Delegate.Remove(d, handler)
+            self.events[index] = d         
+        except:
+            raise
+                  
+    def Emit(event_name, *args):
+        index = TypeManager.GetRecord(GetType()).GetEventIndex(event_name)
+        self.EmitRaw(index, args)      
             
-    # converted up to here
-    
-        protected void RemoveHandler(int index, Delegate handler)
-        {
-            try
-            {   
-                Delegate d = m_events[index];
-                d = Delegate.Remove(d, handler);
-                m_events[index] = d;    
-            }
-            catch(Exception e)
-            {
-                throw e;
-            }
-        }
+    def protected Emit(index, *args):
+        self.EmitRaw(index, args)
 
-        public void Emit(string event_name, params object[] args)
-        {
-            int index = TypeManager.GetRecord(GetType()).GetEventIndex(event_name);
-            EmitRaw(index, args);        
-        }
-
-        protected void Emit(int index, params object[] args)
-        {
-            EmitRaw(index, args);
-        }
-
-        protected void EmitRaw(int index, object[] args)
-        {
-            Delegate d = m_events[index];
-            if(d != null)
-                d.DynamicInvoke(args);
-        }
-	}
-}
+    private def EmitRaw(index, *args):
+        d = self.events[index]
+        if is not null:
+            d.DynamicInvoke(args)
 

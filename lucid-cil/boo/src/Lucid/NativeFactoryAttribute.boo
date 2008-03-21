@@ -1,24 +1,15 @@
-using System;
-
 namespace Lucid
-{
-    [AttributeUsage(AttributeTargets.Assembly)]
-    public class NativeFactoryAttribute: Attribute
-    {
-        private Type m_type;
 
-        public NativeFactoryAttribute(Type type)
-        {
-            m_type = type;
-        }
+import System
 
-        public Type Type
-        {
-            get
-            {
-                return m_type;
-            }
-        }
-    }
-}
+[AttributeUsage(AttributeTargets.Assembly)]
+class NativeFactoryAttribute(Attribute):
 
+    type as Type
+
+    def constructor(type):
+        self.type = type
+        
+    property Type as Type:
+        get:
+            return self.type

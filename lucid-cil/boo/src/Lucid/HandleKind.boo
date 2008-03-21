@@ -1,10 +1,10 @@
-using System;
-
 namespace Lucid
+
+import System
+
+[Flags]
+enum HandleKind
 {
-    [Flags]
-    public enum HandleKind
-    {
-        FD = 0
-    }
-}   
+    FD = 0
+}
+  

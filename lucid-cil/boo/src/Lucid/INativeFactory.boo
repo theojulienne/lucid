@@ -1,13 +1,11 @@
-using System;
-using System.IO;
-
 namespace Lucid
-{
-    public interface INativeFactory
-    {
-        IEventLoop GetLoop();
-        ILogger GetLogger();
-        Stream CreateStream(OSHandle handle, bool owns_handle);
-        IWaitEvent CreateWaitEvent();
-    }
-}
+
+import System
+import System.IO
+
+
+interface INativeFactory:
+    def GetLoop() as IEventLoop
+    def GetLogger() as ILogger
+    def CreateStream(handle as OSHandle, owns_handle as bool) as Stream
+    def CreateWaitEvent as IWaitEvent

@@ -1,28 +1,21 @@
-using System;
-
 namespace Lucid
-{
-    public delegate void WatchHandler(object source, 
-        OSHandle handle, WatchEventKind events);
-    public delegate void TimeoutHandler(object source);
 
-    public interface IEventLoop
-    {
-        object AddWatch(OSHandle handle, WatchEventKind events, WatchHandler handler);   
-        void UpdateWatch(object source, WatchEventKind events);
-        object AddTimeout(uint timeout, TimeoutHandler handler);
-        void RemoveSource(object source);         
+import System
 
-        void Run();
-        bool RunIteration(bool block);
+callable WatchHandler(source, handle as OSHandle, events as WatchEventKind)
+callable TimeoutHandler(source)
 
-        void Quit();
+interface IEventLoop:
+    def AddWatch(handle as OSHandle, events as WatchEventKind, handler as WatchHandler) as object   
+    def UpdateWatch(source, events as WatchEventKind)
+    def AddTimeout(timeout as uint, handler as TimeoutHandler) as object
+    def RemoveSource(source)       
+    def Run()
+    def RunIteration(block as bool) as bool
+    def Quit()
 
-        bool Pending
-        {
-            get;
-        }
-    }
+    bool Pending:
+        get
 
     /*
 	public static class MainLoop
@@ -138,6 +131,6 @@ namespace Lucid
 			return GLib.Source.Remove(source_id);
 		}				
 	}
-    */
 }
+*/
 
