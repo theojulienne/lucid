@@ -19,7 +19,7 @@ def blick(sender, evt_name):
 
 def enum_test():
     x = io.WatchEventKind.In | io.WatchEventKind.Out
-    print io.WatchEventKind.In & x
+    print x & io.WatchEventKind.In
 
 def lobject_test():
     o = Bar()

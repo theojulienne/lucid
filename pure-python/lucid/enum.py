@@ -30,7 +30,12 @@ class IntEnumValue(_enum.EnumValue):
         return self.index & int(other)
     def __or__(self, other):
         return self.index | int(other)
-
+    def __rand__(self, other):
+        return self.__and__(other)
+    def __ror__(self, other):
+        return self.__or__(other)
+        
+        
 _kwds = { "value_type" : IntEnumValue }        
 
 def Enum(*keys):
