@@ -42,6 +42,7 @@ class Object(EventObject):
     def RemoveChild(child as Lucid.Object):
         assert self.children.Remove(child)
         
-    def IterChildren() as IEnumerator of Lucid.Object:
-        return self.children.GetEnumerator()
+    def Children as IEnumerator of Lucid.Object:
+        get:
+            return self.children.GetEnumerator()    
                  
