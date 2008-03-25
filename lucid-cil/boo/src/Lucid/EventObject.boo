@@ -16,11 +16,11 @@ abstract class EventObject(BaseObject):
         if count > 0:
             self.events = array(Delegate, count)
 
-    def AddHandler(event_name, handler):
+    def AddHandler(event_name as string, handler):
         index = TypeManager.GetRecord(self.GetType()).GetEventIndex(event_name)  
         self.AddHandler(index, handler)
 
-    def RemoveHandler(event_name, handler):
+    def RemoveHandler(event_name as string, handler):
         index = TypeManager.GetRecord(self.GetType()).GetEventIndex(event_name)  
         self.RemoveHandler(index, handler)
 
@@ -40,14 +40,11 @@ abstract class EventObject(BaseObject):
         except:
             raise
                   
-    protected def Emit(event_name, *args):
+    protected def Emit(event_name as string, *args):
         index = TypeManager.GetRecord(GetType()).GetEventIndex(event_name)
-        self.EmitRaw(index, args)      
+        self.Emit(index, args)      
             
     protected def Emit(index as int, *args):
-        self.EmitRaw(index, args)
-
-    private def EmitRaw(index, *args):
         d = self.events[index]
         if d is not null:
             d.DynamicInvoke(args)

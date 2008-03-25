@@ -9,7 +9,7 @@ abstract class Global:
     static private main as Thread = null
 
     static public MainThread as Thread:
-        internal set:
+        set:
             main = value
         get:
             return main

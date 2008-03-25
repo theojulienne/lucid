@@ -5,8 +5,11 @@ import System.Reflection
 import System.Threading
 
 
-public abstract class Application:
+public class Application:
 
+    protected def constructor():
+        pass
+        
     static def Init(args as (string)):
         Global.MainThread = Thread.CurrentThread
         Native.Load()
@@ -16,11 +19,11 @@ public abstract class Application:
 
     static public Debug = false
 
-    static def WriteDebug(message, *args):
+    static def WriteDebug(message as string, *args):
         if Debug:
             Native.Factory.GetLogger().WriteDebug(message, args)
 
-    static def WriteWarning(message, *args):
+    static def WriteWarning(message as string, *args):
         if Debug:
             Native.Factory.GetLogger().WriteWarning(message, args)
 
