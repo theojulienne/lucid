@@ -36,7 +36,8 @@ internal abstract class Native:
                      
         if impl_attr is null or impl_attr.Type is null:
             Native.Factory = FallbackFactory()
-    
+            return 
+            
         t = impl_attr.Type
         method = t.GetMethod("Get", BindingFlags.Static | BindingFlags.Public)
         Native.Factory = method.Invoke(null, null)
