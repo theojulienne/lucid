@@ -35,9 +35,9 @@ internal abstract class Native:
                             break   
                      
         if impl_attr is null or impl_attr.Type is null:
-            raise InvalidOperationException("Couldn't find native library.")
+            Native.Factory = FallbackFactory()
     
         t = impl_attr.Type
         method = t.GetMethod("Get", BindingFlags.Static | BindingFlags.Public)
-        Factory = method.Invoke(null, null)
+        Native.Factory = method.Invoke(null, null)
 
