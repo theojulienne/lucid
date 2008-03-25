@@ -7,10 +7,10 @@ import System.IO
 internal class FallbackLogger(ILogger):
     
     def WriteDebug(message as string, args as (object)):
-        Console.Out.WriteLine(message, args)
+        Console.Out.WriteLine(message, *args)
         
     def WriteWarning(message as string, args as (object)):
-        Console.Error.WriteLine(message, args)
+        Console.Error.WriteLine(message, *args)
 
 
 internal class FallbackFactory(INativeFactory):
