@@ -23,6 +23,7 @@ public class Application:
         if Debug:
             Native.Factory.GetLogger().WriteDebug(message, args)
 
+    //FIXME: Should this run anyway? (Regardless of the 'if' statement)
     static def WriteWarning(message as string, *args):
         if Debug:
             Native.Factory.GetLogger().WriteWarning(message, args)
