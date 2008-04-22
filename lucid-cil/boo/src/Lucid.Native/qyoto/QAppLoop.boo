@@ -131,7 +131,7 @@ class QAppLoop(QObject, IEventLoop):
             val |= QSocketNotifier.TypeOf.Read
         elif (events & WatchEventKind.Out) != 0:
             val |= QSocketNotifier.TypeOf.Write
-        elif (events & WatchEventKind.Err) != 0:
+        elif ((events & WatchEventKind.Err) != 0) or ((events & WatchEventKind.Hup) != 0):
             val |= QSocketNotifier.TypeOf.Exception
         return val
 
