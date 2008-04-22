@@ -47,4 +47,7 @@ public class Application:
     static def AddTimeout(timeout as uint, handler as TimeoutHandler) as object:
         return Native.Factory.GetLoop().AddTimeout(timeout, handler)
                 
+    static def RemoveSource(source):
+        Native.Factory.GetLoop().RemoveSource(source)
+
 

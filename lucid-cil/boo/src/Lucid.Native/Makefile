@@ -1,3 +1,3 @@
 all: 
-	make -C linux
-	mv linux/Lucid.Native.dll .
+	make -C qyoto
+	mv qyoto/Lucid.Native.dll .
