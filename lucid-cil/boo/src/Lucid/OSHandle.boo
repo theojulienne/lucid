@@ -1,6 +1,7 @@
 namespace Lucid
 
 import System
+import System.IO
 import System.Runtime.InteropServices
 
 
@@ -20,6 +21,9 @@ class OSHandle(ValueType):
         
     override def ToString() as string:
         return String.Format("{0:x2} [{1}]", Handle, HandleKind)
+
+    public static def CreateStream(handle as OSHandle, owns_handle as bool) as Stream:
+        return Native.Factory.CreateStream(handle, owns_handle)
 
     //TODO
       /*  public static implicit operator IntPtr(OSHandle handle)
