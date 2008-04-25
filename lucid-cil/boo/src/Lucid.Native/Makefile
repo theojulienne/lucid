@@ -1,3 +1,5 @@
+PLATFORM=linux
+
 all: 
-	make -C qyoto
-	mv qyoto/Lucid.Native.dll .
+	make -C $(PLATFORM)
+	mv $(PLATFORM)/Lucid.Native.dll .
