@@ -11,11 +11,15 @@ class OSHandle(ValueType):
     public Handle as IntPtr
     public HandleKind as HandleKind
         
-    def constructor(handle):
+    def constructor(handle as int):
+        Handle = cast(IntPtr, handle)
+        HandleKind = HandleKind.FD
+
+    def constructor(handle as IntPtr):
         Handle = handle
         HandleKind = HandleKind.FD
 
-    def constructor(handle, kind):
+    def constructor(handle as IntPtr, kind as HandleKind):
         Handle = handle
         HandleKind = kind
         

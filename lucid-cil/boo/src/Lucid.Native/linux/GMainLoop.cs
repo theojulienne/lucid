@@ -138,7 +138,7 @@ namespace Lucid.GLib
                 throw new ArgumentException(String.Format("Handle of type \"{0}\" not supported by {1}", handle.HandleKind, GetType()));
     
             uint[] id_object = new uint[1];
-            IntPtr source = GIOChannel.CreateWatch((int)((IntPtr)handle), 
+            IntPtr source = GIOChannel.CreateWatch((int)((IntPtr)handle.Handle), 
                 events, handler, id_object);
 
             uint id = g_source_attach(source, Context);
